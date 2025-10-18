@@ -27,6 +27,7 @@ export default function NavBar() {
   }, []);
 
   const navItems = [
+    { href: "/rant-reflect", label: "Rant & Reflect", icon: "🎧" },
     { href: "/dummy/today", label: "Today's Sessions", icon: "🌌" },
     { href: "/dummy/my-calendar", label: "My Calendar", icon: "📅" },
   ];
