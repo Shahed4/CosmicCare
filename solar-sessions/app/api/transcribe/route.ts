@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { transcribeAudio } from "@/lib/whisper";
-import { analyzeEmotion } from "@/lib/gemini";
+import { tryGeminiTranscription } from "@/lib/transcribeFallback";
+import { analyzeEmotion } from "@/lib/openai";
 import { createClient } from "@supabase/supabase-js";
 
 export const runtime = 'nodejs';
@@ -73,17 +74,52 @@ export async function POST(request: NextRequest) {
       transcription = await transcribeAudio(audioFile);
       console.log(`[INFO] Transcription completed: "${transcription.substring(0, 50)}..."`);
     } catch (error: unknown) {
+      const anyErr = error as any;
+      const status = anyErr?.status;
       const message = getErrorMessage(error);
-      console.error("[ERROR] Whisper transcription failed:", message);
-      return NextResponse.json(
-        {
-          error: true,
-          message: "Speech-to-text conversion failed",
-          code: "WHISPER_ERROR",
-          details: message,
-        },
-        { status: 500 }
-      );
+      console.error("[ERROR] Whisper transcription failed:", status ? `${status} ${message}` : message);
+
+      // If 429 from OpenAI, surface a friendlier 429 response and avoid retry storms
+      if (status === 429 || /\b429\b/.test(message)) {
+        // Optional: attempt a fallback to Gemini transcription (currently returns null)
+        try {
+          const fallback = await tryGeminiTranscription(audioFile);
+          if (fallback && fallback.trim()) {
+            transcription = fallback.trim();
+            console.log(`[INFO] Used Gemini fallback transcription: "${transcription.substring(0, 50)}..."`);
+          } else {
+            return NextResponse.json(
+              {
+                error: true,
+                message: "Speech-to-text temporarily unavailable due to rate limit. Please wait a minute and try again.",
+                code: "RATE_LIMIT",
+                details: message,
+              },
+              { status: 429 }
+            );
+          }
+        } catch (fallbackErr) {
+          return NextResponse.json(
+            {
+              error: true,
+              message: "Speech-to-text temporarily unavailable due to rate limit. Please try again later.",
+              code: "RATE_LIMIT",
+              details: getErrorMessage(fallbackErr),
+            },
+            { status: 429 }
+          );
+        }
+      } else {
+        return NextResponse.json(
+          {
+            error: true,
+            message: "Speech-to-text conversion failed",
+            code: "WHISPER_ERROR",
+            details: message,
+          },
+          { status: 500 }
+        );
+      }
     }
 
     // Check if transcription is empty
@@ -98,7 +134,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Step 2: Analyze emotion using Gemini
+    // Step 2: Analyze emotion using OpenAI
     let emotionData;
     try {
       emotionData = await analyzeEmotion(transcription);
@@ -107,12 +143,12 @@ export async function POST(request: NextRequest) {
       );
     } catch (error: unknown) {
       const message = getErrorMessage(error);
-      console.error("[ERROR] Gemini emotion analysis failed:", message);
+      console.error("[ERROR] OpenAI emotion analysis failed:", message);
       return NextResponse.json(
         {
           error: true,
           message: "Emotion analysis failed",
-          code: "GEMINI_ERROR",
+          code: "OPENAI_EMOTION_ERROR",
           details: message,
         },
         { status: 500 }

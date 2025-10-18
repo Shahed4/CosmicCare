@@ -63,7 +63,15 @@ export default function RantReflectPage() {
       if (response.ok) {
         setResult(data);
       } else {
-        setError(data.message || "An error occurred during processing");
+        // Provide friendly rate limit message
+        if (response.status === 429 || data?.code === 'RATE_LIMIT') {
+          setError(
+            data?.message ||
+              "We've hit the speech-to-text rate limit. Please wait ~1 minute and try again."
+          );
+        } else {
+          setError(data?.message || "An error occurred during processing");
+        }
       }
     } catch (err: unknown) {
       const errMsg = err instanceof Error ? err.message : String(err);
