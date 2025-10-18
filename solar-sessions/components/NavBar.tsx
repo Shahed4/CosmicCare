@@ -27,8 +27,10 @@ export default function NavBar() {
   }, []);
 
   const navItems = [
-    { href: "/dummy/today", label: "Today's Sessions", icon: "🌌" },
-    { href: "/dummy/my-calendar", label: "My Calendar", icon: "📅" },
+    { href: "/today", label: "Today's Sessions", icon: "🌌" },
+    { href: "/my-calendar", label: "My Calendar", icon: "📅" },
+    { href: "/dummy/today", label: "Today (Demo)", icon: "🌌" },
+    { href: "/dummy/my-calendar", label: "Calendar (Demo)", icon: "📅" },
   ];
 
   const isActive = (href: string) => {

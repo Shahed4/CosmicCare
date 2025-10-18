@@ -11,6 +11,8 @@ interface AuthContextType {
   signUp: (email: string, password: string, displayName?: string) => Promise<{ error: AuthError | null }>
   signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>
   signOut: () => Promise<{ error: AuthError | null }>
+  getUserProfile: () => Promise<{ data: any; error: any }>
+  ensureUserExists: () => Promise<{ error: any }>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -54,15 +56,53 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     })
+    
+    // Ensure user exists in our users table and update last_login
+    if (data.user && !error) {
+      await supabase.rpc('ensure_user_exists', { 
+        user_id: data.user.id,
+        user_email: data.user.email,
+        display_name: data.user.user_metadata?.display_name || null
+      })
+    }
+    
     return { error }
   }
 
   const signOut = async () => {
     const { error } = await supabase.auth.signOut()
+    return { error }
+  }
+
+  const getUserProfile = async () => {
+    if (!user) {
+      return { data: null, error: new Error('No user logged in') }
+    }
+    
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', user.id)
+      .single()
+    
+    return { data, error }
+  }
+
+  const ensureUserExists = async () => {
+    if (!user) {
+      return { error: new Error('No user logged in') }
+    }
+    
+    const { error } = await supabase.rpc('ensure_user_exists', { 
+      user_id: user.id,
+      user_email: user.email,
+      display_name: user.user_metadata?.display_name || null
+    })
+    
     return { error }
   }
 
@@ -73,6 +113,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signUp,
     signIn,
     signOut,
+    getUserProfile,
+    ensureUserExists,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
