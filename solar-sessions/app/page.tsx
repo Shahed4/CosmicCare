@@ -7,7 +7,7 @@ import dynamic from "next/dynamic";
 const SpaceBackground = dynamic(() => import("../components/SpaceBackground"), {
   ssr: false,
   loading: () => (
-    <div style={{ 
+    <div style={{
       position: "fixed",
       top: 0,
       left: 0,
@@ -28,8 +28,8 @@ export default function HomePage() {
 
   if (!mounted) {
     return (
-      <div style={{ 
-        height: "100dvh", 
+      <div style={{
+        height: "100dvh",
         background: "linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%)",
         display: "flex",
         alignItems: "center",
@@ -106,11 +106,11 @@ export default function HomePage() {
             opacity: 0.9,
             margin: "0 0 2rem 0"
           }}>
-            Transform your daily sessions into an interactive solar system. 
-            Each planet represents a session, and moons orbit around them as emotions. 
+            Transform your daily sessions into an interactive solar system.
+            Each planet represents a session, and moons orbit around them as emotions.
             Explore your day in a beautiful, immersive 3D experience.
           </p>
-          
+
           <div style={{
             display: "flex",
             flexWrap: "wrap",
@@ -155,7 +155,7 @@ export default function HomePage() {
         <div style={{
           animation: "fadeInUp 1s ease-out 0.6s both"
         }}>
-          <Link 
+          <Link
             href="/dummy/today"
             style={{
               display: "inline-block",
@@ -182,7 +182,7 @@ export default function HomePage() {
               e.currentTarget.style.boxShadow = "0 8px 25px rgba(255, 215, 0, 0.3)";
             }}
           >
-            Explore Today's Sessions
+            Explore Today&apos;s Sessions
           </Link>
         </div>
 
