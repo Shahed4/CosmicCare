@@ -4,12 +4,43 @@
 import { useState, useEffect } from "react";
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../../contexts/AuthContext';
-import { monthData } from "../../../constants/month";
+import { supabase } from '../../../lib/supabase';
+
+interface DailySession {
+  id: string;
+  session_date: string;
+  session_name: string;
+  session_color: string;
+  emotions: {
+    positive: Array<{ name: string; intensity: number; color: string }>;
+    negative: Array<{ name: string; intensity: number; color: string }>;
+  };
+  created_at: string;
+}
+
+interface MonthData {
+  [date: string]: {
+    sessions: Array<{
+      name: string;
+      color: string;
+      emotions: {
+        positive: Array<{ name: string; intensity: number; color: string }>;
+        negative: Array<{ name: string; intensity: number; color: string }>;
+      };
+    }>;
+    positiveIntensity: number;
+    negativeIntensity: number;
+  };
+}
 
 export default function MyCalendarPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [monthData, setMonthData] = useState<MonthData>({});
+  const [isLoadingData, setIsLoadingData] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [currentMonth, setCurrentMonth] = useState(new Date());
 
   // Redirect if user is not authenticated
   useEffect(() => {
@@ -17,6 +48,72 @@ export default function MyCalendarPage() {
       router.push('/login');
     }
   }, [user, loading, router]);
+
+  // Load calendar data from Supabase
+  useEffect(() => {
+    if (user) {
+      loadMonthData();
+    }
+  }, [user, currentMonth]);
+
+  const loadMonthData = async () => {
+    try {
+      setIsLoadingData(true);
+      const year = currentMonth.getFullYear();
+      const month = currentMonth.getMonth();
+
+      // Get first and last day of month
+      const firstDay = new Date(year, month, 1).toISOString().split('T')[0];
+      const lastDay = new Date(year, month + 1, 0).toISOString().split('T')[0];
+
+      const { data: sessions, error: dbError } = await supabase
+        .from('daily_sessions')
+        .select('*')
+        .gte('session_date', firstDay)
+        .lte('session_date', lastDay)
+        .order('session_date', { ascending: true });
+
+      if (dbError) throw dbError;
+
+      // Transform data into calendar format
+      const transformed: MonthData = {};
+
+      if (sessions) {
+        sessions.forEach((session: DailySession) => {
+          const date = session.session_date;
+
+          if (!transformed[date]) {
+            transformed[date] = {
+              sessions: [],
+              positiveIntensity: 0,
+              negativeIntensity: 0
+            };
+          }
+
+          transformed[date].sessions.push({
+            name: session.session_name,
+            color: session.session_color,
+            emotions: session.emotions
+          });
+
+          // Calculate intensities
+          const positiveSum = session.emotions.positive.reduce((sum, e) => sum + e.intensity, 0);
+          const negativeSum = session.emotions.negative.reduce((sum, e) => sum + e.intensity, 0);
+
+          transformed[date].positiveIntensity += positiveSum;
+          transformed[date].negativeIntensity += negativeSum;
+        });
+      }
+
+      setMonthData(transformed);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      setError(message);
+      console.error('Error loading calendar data:', message);
+    } finally {
+      setIsLoadingData(false);
+    }
+  };
 
   // Show loading while checking authentication
   if (loading) {
@@ -100,13 +197,13 @@ export default function MyCalendarPage() {
     );
   }
 
-  // Get the current month and year from the data
-  const monthName = "October 2025"; // Explicitly set to October since our data is for October
+  // Get the current month and year
+  const monthName = currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
-  // Create a calendar grid for October 2025
+  // Create a calendar grid for the current month
   const createCalendarGrid = () => {
-    const year = 2025;
-    const month = 9; // October (0-indexed)
+    const year = currentMonth.getFullYear();
+    const month = currentMonth.getMonth();
 
     // Get first day of month and number of days
     const firstDay = new Date(year, month, 1);
@@ -124,7 +221,7 @@ export default function MyCalendarPage() {
     // Add all days of the month
     for (let day = 1; day <= daysInMonth; day++) {
       const dateString = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-      const dayData = monthData.days.find(d => d.date === dateString);
+      const dayData = monthData[dateString];
 
       calendarDays.push({
         date: day,
@@ -241,6 +338,54 @@ export default function MyCalendarPage() {
 
   const calendarDays = createCalendarGrid();
 
+  // Show loading while fetching data
+  if (isLoadingData) {
+    return (
+      <div style={{
+        height: "100vh",
+        background: "linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        color: "white",
+        fontFamily: "system-ui, -apple-system, sans-serif"
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{
+            fontSize: '1.2rem',
+            marginBottom: '1rem',
+            background: 'linear-gradient(45deg, #ffd700, #ff8c00)',
+            backgroundClip: 'text',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent'
+          }}>
+            Loading calendar...
+          </div>
+          <div style={{
+            width: '40px',
+            height: '40px',
+            border: '3px solid rgba(255, 215, 0, 0.3)',
+            borderRadius: '50%',
+            borderTopColor: '#ffd700',
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto'
+          }} />
+        </div>
+        <style jsx>{`
+          @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+          }
+        `}</style>
+      </div>
+    );
+  }
+
+  const changeMonth = (delta: number) => {
+    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + delta, 1));
+    setSelectedDate(null); // Clear selection when changing months
+  };
+
   return (
     <div style={{
       minHeight: "100vh",
@@ -270,13 +415,52 @@ export default function MyCalendarPage() {
           }}>
             Emotional Calendar
           </h1>
-          <p style={{
-            fontSize: "1.2rem",
-            color: "rgba(255, 255, 255, 0.7)",
+
+          {/* Month Navigation */}
+          <div style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: "1rem",
             marginBottom: "1rem"
           }}>
-            {monthName}
-          </p>
+            <button
+              onClick={() => changeMonth(-1)}
+              style={{
+                padding: "0.5rem 1rem",
+                background: "rgba(255, 215, 0, 0.1)",
+                border: "1px solid rgba(255, 215, 0, 0.3)",
+                borderRadius: "8px",
+                color: "#ffd700",
+                cursor: "pointer",
+                fontSize: "1rem"
+              }}
+            >
+              ← Previous
+            </button>
+            <p style={{
+              fontSize: "1.2rem",
+              color: "rgba(255, 255, 255, 0.9)",
+              fontWeight: "600",
+              minWidth: "200px"
+            }}>
+              {monthName}
+            </p>
+            <button
+              onClick={() => changeMonth(1)}
+              style={{
+                padding: "0.5rem 1rem",
+                background: "rgba(255, 215, 0, 0.1)",
+                border: "1px solid rgba(255, 215, 0, 0.3)",
+                borderRadius: "8px",
+                color: "#ffd700",
+                cursor: "pointer",
+                fontSize: "1rem"
+              }}
+            >
+              Next →
+            </button>
+          </div>
           <div style={{
             display: "flex",
             justifyContent: "center",
@@ -404,7 +588,7 @@ export default function MyCalendarPage() {
             border: "1px solid rgba(255, 255, 255, 0.1)"
           }}>
             {(() => {
-              const dayData = monthData.days.find(d => d.date === selectedDate);
+              const dayData = selectedDate ? monthData[selectedDate] : null;
               if (!dayData) return null;
 
               // Calculate average positive and negative percentages across all sessions
