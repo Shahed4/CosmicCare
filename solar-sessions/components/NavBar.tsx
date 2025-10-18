@@ -28,6 +28,7 @@ export default function NavBar() {
 
   const navItems = [
     { href: "/rant-reflect", label: "Rant & Reflect", icon: "🎧" },
+    { href: "/history", label: "History", icon: "📜" },
     { href: "/dummy/today", label: "Today's Sessions", icon: "🌌" },
     { href: "/dummy/my-calendar", label: "My Calendar", icon: "📅" },
   ];
@@ -60,7 +61,7 @@ export default function NavBar() {
       fontFamily: "system-ui, -apple-system, sans-serif"
     }}>
       {/* Logo */}
-      <Link 
+      <Link
         href="/"
         style={{
           textDecoration: "none",
@@ -102,11 +103,11 @@ export default function NavBar() {
                 padding: "0.5rem 1rem",
                 borderRadius: "8px",
                 transition: "all 0.3s ease",
-                background: isActive(item.href) 
-                  ? "rgba(255, 215, 0, 0.1)" 
+                background: isActive(item.href)
+                  ? "rgba(255, 215, 0, 0.1)"
                   : "transparent",
-                border: isActive(item.href) 
-                  ? "1px solid rgba(255, 215, 0, 0.3)" 
+                border: isActive(item.href)
+                  ? "1px solid rgba(255, 215, 0, 0.3)"
                   : "1px solid transparent",
                 display: "flex",
                 alignItems: "center",
@@ -134,9 +135,9 @@ export default function NavBar() {
         </div>
 
         {/* Authentication Section */}
-        <div style={{ 
-          display: "flex", 
-          alignItems: "center", 
+        <div style={{
+          display: "flex",
+          alignItems: "center",
           gap: "0.5rem",
           paddingLeft: "1rem",
           borderLeft: "1px solid rgba(255, 255, 255, 0.1)"
@@ -171,14 +172,14 @@ export default function NavBar() {
                 }}
               >
                 <span>{user.user_metadata?.display_name || user.email}</span>
-                <span style={{ 
+                <span style={{
                   transform: isUserDropdownOpen ? "rotate(180deg)" : "rotate(0deg)",
                   transition: "transform 0.3s ease"
                 }}>
                   ▼
                 </span>
               </button>
-              
+
               {isUserDropdownOpen && (
                 <div
                   style={{
@@ -315,11 +316,11 @@ export default function NavBar() {
                 padding: "0.75rem 1rem",
                 borderRadius: "8px",
                 transition: "all 0.3s ease",
-                background: isActive(item.href) 
-                  ? "rgba(255, 215, 0, 0.1)" 
+                background: isActive(item.href)
+                  ? "rgba(255, 215, 0, 0.1)"
                   : "transparent",
-                border: isActive(item.href) 
-                  ? "1px solid rgba(255, 215, 0, 0.3)" 
+                border: isActive(item.href)
+                  ? "1px solid rgba(255, 215, 0, 0.3)"
                   : "1px solid transparent",
                 display: "flex",
                 alignItems: "center",
@@ -345,7 +346,7 @@ export default function NavBar() {
             transform: translateY(0);
           }
         }
-        
+
         @media (max-width: 768px) {
           nav > div:nth-child(2) {
             display: none !important;

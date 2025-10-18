@@ -202,7 +202,7 @@ solar-sessions/
    ```
 
 3. **Configure environment variables**
-   
+
    Create a `.env.local` file in the root directory:
    ```env
    # Supabase (Optional - for authentication)

@@ -6,6 +6,8 @@ import Recorder from "@/components/Recorder";
 import TranscriptView from "@/components/TranscriptView";
 import EmotionCard from "@/components/EmotionCard";
 import Loader from "@/components/Loader";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/lib/supabase";
 
 const SpaceBackground = dynamic(() => import("@/components/SpaceBackground"), {
   ssr: false,
@@ -25,6 +27,7 @@ export default function RantReflectPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [result, setResult] = useState<TranscriptionResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
 
   const handleRecordingComplete = async (audioBlob: Blob) => {
     setIsProcessing(true);
@@ -39,9 +42,19 @@ export default function RantReflectPage() {
       });
       formData.append("audio", audioFile);
 
+      // Get auth token if user is logged in
+      const headers: HeadersInit = {};
+      if (user) {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.access_token) {
+          headers['Authorization'] = `Bearer ${session.access_token}`;
+        }
+      }
+
       // Send to API
       const response = await fetch("/api/transcribe", {
         method: "POST",
+        headers,
         body: formData,
       });
 

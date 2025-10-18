@@ -16,7 +16,7 @@ export default function AuthModal({ isOpen, onClose, mode, onModeChange }: AuthM
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
-  
+
   const { signIn, signUp } = useAuth();
 
   const handleModeSwitch = (newMode: 'login' | 'signup') => {
@@ -114,7 +114,7 @@ export default function AuthModal({ isOpen, onClose, mode, onModeChange }: AuthM
           opacity: 0.4,
           pointerEvents: 'none'
         }} />
-        
+
         <div style={{
           position: 'relative',
           zIndex: 1
@@ -304,8 +304,8 @@ export default function AuthModal({ isOpen, onClose, mode, onModeChange }: AuthM
               padding: '1rem',
               borderRadius: '12px',
               border: 'none',
-              background: loading 
-                ? 'rgba(255, 215, 0, 0.3)' 
+              background: loading
+                ? 'rgba(255, 215, 0, 0.3)'
                 : 'linear-gradient(45deg, #ffd700, #ff8c00)',
               color: loading ? 'rgba(255, 255, 255, 0.7)' : '#000',
               fontSize: '1.1rem',
@@ -314,8 +314,8 @@ export default function AuthModal({ isOpen, onClose, mode, onModeChange }: AuthM
               transition: 'all 0.3s ease',
               textTransform: 'uppercase',
               letterSpacing: '0.05em',
-              boxShadow: loading 
-                ? 'none' 
+              boxShadow: loading
+                ? 'none'
                 : '0 8px 25px rgba(255, 215, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
               position: 'relative',
               overflow: 'hidden'
@@ -335,7 +335,7 @@ export default function AuthModal({ isOpen, onClose, mode, onModeChange }: AuthM
           >
             {loading ? (
               <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
-                <span style={{ 
+                <span style={{
                   display: 'inline-block',
                   width: '16px',
                   height: '16px',
@@ -415,7 +415,7 @@ export default function AuthModal({ isOpen, onClose, mode, onModeChange }: AuthM
         </div>
         </div>
       </div>
-      
+
       {/* CSS Animations */}
       <style jsx>{`
         @keyframes fadeIn {
@@ -426,7 +426,7 @@ export default function AuthModal({ isOpen, onClose, mode, onModeChange }: AuthM
             opacity: 1;
           }
         }
-        
+
         @keyframes slideInUp {
           from {
             opacity: 0;
@@ -437,12 +437,12 @@ export default function AuthModal({ isOpen, onClose, mode, onModeChange }: AuthM
             transform: translateY(0) scale(1);
           }
         }
-        
+
         @keyframes twinkle {
           0%, 100% { opacity: 0.4; }
           50% { opacity: 0.8; }
         }
-        
+
         @keyframes spin {
           from {
             transform: rotate(0deg);

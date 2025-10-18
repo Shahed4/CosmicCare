@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { transcribeAudio } from "@/lib/whisper";
 import { analyzeEmotion } from "@/lib/gemini";
+import { createClient } from "@supabase/supabase-js";
 
 export const runtime = 'nodejs';
 export const maxDuration = 60; // 60 seconds timeout for serverless function
@@ -121,7 +122,48 @@ export async function POST(request: NextRequest) {
     // Calculate processing time
     const processingTime = ((Date.now() - startTime) / 1000).toFixed(2);
 
-    // Step 3: Send successful response
+    // Step 3: Save to Supabase (if user is authenticated)
+    try {
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+
+      // Get user session from request headers
+      const authHeader = request.headers.get('authorization');
+      if (authHeader) {
+        const { data: { user } } = await supabase.auth.getUser(
+          authHeader.replace('Bearer ', '')
+        );
+
+        if (user) {
+          // Save rant session to database
+          const { error: dbError } = await supabase
+            .from('rant_sessions')
+            .insert({
+              user_id: user.id,
+              transcript: transcription,
+              emotion: emotionData.emotion,
+              intensity: parseInt(emotionData.confidence) || null,
+              ai_insight: emotionData.suggestions,
+              audio_duration: Math.round(audioFile.size / 16000), // rough estimate
+              audio_size: audioFile.size,
+            });
+
+          if (dbError) {
+            console.error('[WARN] Failed to save to database:', dbError.message);
+            // Don't fail the request if DB save fails
+          } else {
+            console.log('[INFO] Session saved to database');
+          }
+        }
+      }
+    } catch (dbError) {
+      console.error('[WARN] Database operation failed:', getErrorMessage(dbError));
+      // Continue even if DB save fails
+    }
+
+    // Step 4: Send successful response
     const response = {
       text: transcription,
       emotion: emotionData.emotion,

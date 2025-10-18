@@ -97,16 +97,16 @@ export default function Recorder({ onRecordingComplete, isProcessing }: Recorder
           height: "120px",
           borderRadius: "50%",
           border: isRecording ? "4px solid #ff6b6b" : "4px solid #4CAF50",
-          background: isRecording 
-            ? "linear-gradient(135deg, #ff6b6b, #ff4757)" 
+          background: isRecording
+            ? "linear-gradient(135deg, #ff6b6b, #ff4757)"
             : "linear-gradient(135deg, #4CAF50, #45a049)",
           color: "white",
           fontSize: "1.2rem",
           fontWeight: "700",
           cursor: isProcessing ? "not-allowed" : "pointer",
           transition: "all 0.3s ease",
-          boxShadow: isRecording 
-            ? "0 0 30px rgba(255, 107, 107, 0.6)" 
+          boxShadow: isRecording
+            ? "0 0 30px rgba(255, 107, 107, 0.6)"
             : "0 0 30px rgba(76, 175, 80, 0.6)",
           opacity: isProcessing ? 0.5 : 1,
         }}
@@ -130,10 +130,10 @@ export default function Recorder({ onRecordingComplete, isProcessing }: Recorder
         maxWidth: "300px",
         margin: 0,
       }}>
-        {isRecording 
-          ? "Recording... Click stop when you're done" 
-          : isProcessing 
-          ? "Processing your recording..." 
+        {isRecording
+          ? "Recording... Click stop when you're done"
+          : isProcessing
+          ? "Processing your recording..."
           : "Click to start recording your thoughts"}
       </p>
 

@@ -27,7 +27,7 @@ function SpaceField() {
         fade={true}
         speed={0.5}
       />
-      
+
       {/* Closer star field */}
       <Stars
         radius={100}
@@ -128,18 +128,18 @@ export default function SpaceBackground() {
       <Canvas
         camera={{ position: [0, 0, 100], fov: 75 }}
         style={{ width: "100%", height: "100%" }}
-        gl={{ 
-          antialias: true, 
+        gl={{
+          antialias: true,
           alpha: true,
           powerPreference: "high-performance"
         }}
       >
         <CameraController />
         <SpaceField />
-        
+
         {/* Ambient lighting */}
         <ambientLight intensity={0.1} />
-        
+
         {/* Point lights for depth */}
         <pointLight position={[100, 100, 100]} intensity={0.3} color="#ffd700" />
         <pointLight position={[-100, -100, -100]} intensity={0.2} color="#ff8c00" />

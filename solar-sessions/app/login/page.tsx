@@ -278,8 +278,8 @@ export default function LoginPage() {
               padding: '1rem',
               borderRadius: '12px',
               border: 'none',
-              background: loading 
-                ? 'rgba(255, 215, 0, 0.3)' 
+              background: loading
+                ? 'rgba(255, 215, 0, 0.3)'
                 : 'linear-gradient(45deg, #ffd700, #ff8c00)',
               color: loading ? 'rgba(255, 255, 255, 0.7)' : '#000',
               fontSize: '1.1rem',
@@ -288,8 +288,8 @@ export default function LoginPage() {
               transition: 'all 0.3s ease',
               textTransform: 'uppercase',
               letterSpacing: '0.05em',
-              boxShadow: loading 
-                ? 'none' 
+              boxShadow: loading
+                ? 'none'
                 : '0 8px 25px rgba(255, 215, 0, 0.3)',
               marginBottom: '1.5rem'
             }}
@@ -308,7 +308,7 @@ export default function LoginPage() {
           >
             {loading ? (
               <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
-                <span style={{ 
+                <span style={{
                   display: 'inline-block',
                   width: '16px',
                   height: '16px',
@@ -335,7 +335,7 @@ export default function LoginPage() {
           color: 'rgba(255, 255, 255, 0.6)'
         }}>
           Don&apos;t have an account?{' '}
-          <Link 
+          <Link
             href="/signup"
             style={{
               color: '#ffd700',
@@ -361,7 +361,7 @@ export default function LoginPage() {
           0%, 100% { opacity: 0.3; }
           50% { opacity: 0.6; }
         }
-        
+
         @keyframes spin {
           from {
             transform: rotate(0deg);

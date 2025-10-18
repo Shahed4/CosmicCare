@@ -107,7 +107,7 @@ export default function MyCalendarPage() {
   const createCalendarGrid = () => {
     const year = 2025;
     const month = 9; // October (0-indexed)
-    
+
     // Get first day of month and number of days
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
@@ -125,7 +125,7 @@ export default function MyCalendarPage() {
     for (let day = 1; day <= daysInMonth; day++) {
       const dateString = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
       const dayData = monthData.days.find(d => d.date === dateString);
-      
+
       calendarDays.push({
         date: day,
         dateString,
@@ -149,18 +149,18 @@ export default function MyCalendarPage() {
       sessionCount++;
       let sessionPositive = 0;
       let sessionNegative = 0;
-      
+
       session.emotions.positive.forEach((emotion: any) => {
         sessionPositive += emotion.intensity;
       });
       session.emotions.negative.forEach((emotion: any) => {
         sessionNegative += emotion.intensity;
       });
-      
+
       // Convert session totals to percentages (each session = 100%)
       const sessionPositivePercent = sessionPositive * 100;
       const sessionNegativePercent = sessionNegative * 100;
-      
+
       totalPositivePercent += sessionPositivePercent;
       totalNegativePercent += sessionNegativePercent;
     });
@@ -213,18 +213,18 @@ export default function MyCalendarPage() {
       sessionCount++;
       let sessionPositive = 0;
       let sessionNegative = 0;
-      
+
       session.emotions.positive.forEach((emotion: any) => {
         sessionPositive += emotion.intensity;
       });
       session.emotions.negative.forEach((emotion: any) => {
         sessionNegative += emotion.intensity;
       });
-      
+
       // Convert session totals to percentages (each session = 100%)
       const sessionPositivePercent = sessionPositive * 100;
       const sessionNegativePercent = sessionNegative * 100;
-      
+
       totalPositivePercent += sessionPositivePercent;
       totalNegativePercent += sessionNegativePercent;
     });
@@ -416,18 +416,18 @@ export default function MyCalendarPage() {
                 sessionCount++;
                 let sessionPositive = 0;
                 let sessionNegative = 0;
-                
+
                 session.emotions.positive.forEach((emotion: any) => {
                   sessionPositive += emotion.intensity;
                 });
                 session.emotions.negative.forEach((emotion: any) => {
                   sessionNegative += emotion.intensity;
                 });
-                
+
                 // Convert session totals to percentages (each session = 100%)
                 const sessionPositivePercent = sessionPositive * 100;
                 const sessionNegativePercent = sessionNegative * 100;
-                
+
                 totalPositivePercent += sessionPositivePercent;
                 totalNegativePercent += sessionNegativePercent;
               });
@@ -450,15 +450,15 @@ export default function MyCalendarPage() {
                     {(() => {
                       const [year, month, day] = selectedDate.split('-').map(Number);
                       const date = new Date(year, month - 1, day); // month is 0-indexed
-                      return date.toLocaleDateString('en-US', { 
-                        weekday: 'long', 
-                        year: 'numeric', 
-                        month: 'long', 
-                        day: 'numeric' 
+                      return date.toLocaleDateString('en-US', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
                       });
                     })()}
                   </h3>
-                  
+
                   <div style={{
                     display: "flex",
                     justifyContent: "space-between",
@@ -524,7 +524,7 @@ export default function MyCalendarPage() {
                         }}>
                           {session.name}
                         </h4>
-                        
+
                         <div style={{ marginBottom: "1rem" }}>
                           <h5 style={{
                             fontSize: "0.9rem",
