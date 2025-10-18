@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
       "audio/x-m4a",
     ];
 
-    if (!allowedTypes.includes(audioFile.type) && 
+    if (!allowedTypes.includes(audioFile.type) &&
         !audioFile.name.match(/\.(mp3|wav|m4a|webm|ogg)$/i)) {
       return NextResponse.json(
         {
@@ -71,14 +71,15 @@ export async function POST(request: NextRequest) {
     try {
       transcription = await transcribeAudio(audioFile);
       console.log(`[INFO] Transcription completed: "${transcription.substring(0, 50)}..."`);
-    } catch (error: any) {
-      console.error("[ERROR] Whisper transcription failed:", error);
+    } catch (error: unknown) {
+      const message = getErrorMessage(error);
+      console.error("[ERROR] Whisper transcription failed:", message);
       return NextResponse.json(
         {
           error: true,
           message: "Speech-to-text conversion failed",
           code: "WHISPER_ERROR",
-          details: error.message,
+          details: message,
         },
         { status: 500 }
       );
@@ -103,14 +104,15 @@ export async function POST(request: NextRequest) {
       console.log(
         `[INFO] Emotion analysis completed: ${emotionData.emotion} (intensity: ${emotionData.confidence})`
       );
-    } catch (error: any) {
-      console.error("[ERROR] Gemini emotion analysis failed:", error);
+    } catch (error: unknown) {
+      const message = getErrorMessage(error);
+      console.error("[ERROR] Gemini emotion analysis failed:", message);
       return NextResponse.json(
         {
           error: true,
           message: "Emotion analysis failed",
           code: "GEMINI_ERROR",
-          details: error.message,
+          details: message,
         },
         { status: 500 }
       );
@@ -133,16 +135,29 @@ export async function POST(request: NextRequest) {
     console.log(`[INFO] Request completed in ${processingTime}s`);
     return NextResponse.json(response, { status: 200 });
 
-  } catch (error: any) {
-    console.error("[ERROR] Unexpected error in transcription API:", error);
+  } catch (error: unknown) {
+    const message = getErrorMessage(error);
+    console.error("[ERROR] Unexpected error in transcription API:", message);
     return NextResponse.json(
       {
         error: true,
         message: "An unexpected error occurred",
         code: "INTERNAL_ERROR",
-        details: error.message,
+        details: message,
       },
       { status: 500 }
     );
+  }
+}
+
+/**
+ * Normalize unknown errors to a string message
+ */
+function getErrorMessage(err: unknown): string {
+  if (err instanceof Error) return err.message;
+  try {
+    return String(err);
+  } catch {
+    return 'Unknown error';
   }
 }

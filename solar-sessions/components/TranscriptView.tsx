@@ -36,7 +36,7 @@ export default function TranscriptView({ text }: TranscriptViewProps) {
         color: "rgba(255, 255, 255, 0.9)",
         fontStyle: "italic",
       }}>
-        "{text}"
+        &ldquo;{text}&rdquo;
       </p>
 
       <style jsx>{`

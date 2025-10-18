@@ -1,3 +1,79 @@
+# Solar Sessions — Rant & Reflect (Next.js + Whisper + Gemini)
+
+This folder contains the Next.js app for Solar Sessions with an integrated "Rant & Reflect" feature — a voice-first emotional reflection tool that uses OpenAI Whisper for speech-to-text and Google Gemini for emotion analysis.
+
+This README is focused on the Rant & Reflect integration and how to run it locally.
+
+## Features
+
+- Record short voice rants in the browser (MediaRecorder).
+- Transcribe audio with OpenAI Whisper (server-side API route).
+- Analyze emotional tone with Google Gemini (server-side API route).
+- Minimal, reactive UI components: `Recorder`, `TranscriptView`, `EmotionCard`.
+
+## File highlights
+
+- `app/rant-reflect/page.tsx` — Rant & Reflect UI and orchestration.
+- `app/api/transcribe/route.ts` — serverless API route that accepts an audio `FormData` upload, calls Whisper and Gemini helpers, and returns the combined result.
+- `lib/whisper.ts` — Whisper helper wrapper for OpenAI audio transcription.
+- `lib/gemini.ts` — Gemini helper wrapper for emotion analysis.
+- `components/Recorder.tsx`, `components/TranscriptView.tsx`, `components/EmotionCard.tsx` — frontend UI pieces.
+
+## Environment variables
+
+Create a `.env.local` in the `solar-sessions` folder with the following variables (or set them in your hosting platform):
+
+```
+OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+GEMINI_API_KEY=ya29.a0AfH6S... (or your Gemini credential)
+# Optional: other keys your project needs (e.g. Supabase)
+```
+
+For convenience, a `.env.example` is included alongside this README.
+
+## Local development (quick start)
+
+1. Install dependencies
+
+```bash
+# From the solar-sessions folder
+npm install
+# or
+pnpm install
+```
+
+2. Add your API keys to `.env.local`.
+
+3. Start the dev server
+
+```bash
+npm run dev
+# or
+pnpm dev
+```
+
+4. Open `http://localhost:3000/rant-reflect` and test the recorder.
+
+Notes:
+- The transcription route expects a `POST` with a `FormData` field named `audio` (file). The page already sends `recording.webm` from the browser.
+- Keep audio sessions under 25MB to avoid serverless size limits.
+
+## Troubleshooting
+
+- If imports like `@/lib/whisper` cannot be resolved, ensure your `tsconfig.json` or `jsconfig.json` has `baseUrl`/`paths` configured.
+- If the Whisper or Gemini calls fail, check your env vars and API key scopes.
+
+## Next steps (suggested)
+
+- Add end-to-end tests for the transcription API using a small sample audio fixture.
+- Add persisted session history (Supabase/Postgres) to track emotional trends.
+- Implement real-time streaming transcription for more immediacy.
+
+---
+
+If you'd like, I can also:
+- Add a `.github/workflows` CI job that runs TypeScript checks and lints.
+- Add a small E2E test that POSTs a short audio file to the API route.
 # 🌟 Solar Sessions
 
 > **Visualize Your Day Through Space & Reflect on Your Emotions with AI**

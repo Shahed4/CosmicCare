@@ -363,7 +363,7 @@ export default function AuthModal({ isOpen, onClose, mode, onModeChange }: AuthM
         }}>
           {mode === 'login' ? (
             <>
-              Don't have an account?{' '}
+              Don&apos;t have an account?{' '}
               <button
                 onClick={() => handleModeSwitch('signup')}
                 style={{

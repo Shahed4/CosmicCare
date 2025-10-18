@@ -52,8 +52,9 @@ export default function RantReflectPage() {
       } else {
         setError(data.message || "An error occurred during processing");
       }
-    } catch (err: any) {
-      console.error("Error processing audio:", err);
+    } catch (err: unknown) {
+      const errMsg = err instanceof Error ? err.message : String(err);
+      console.error("Error processing audio:", errMsg);
       setError("Failed to process recording. Please try again.");
     } finally {
       setIsProcessing(false);

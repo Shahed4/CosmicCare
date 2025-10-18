@@ -182,7 +182,7 @@ export default function HomePage() {
               e.currentTarget.style.boxShadow = "0 8px 25px rgba(255, 215, 0, 0.3)";
             }}
           >
-            Explore Today's Sessions
+            Explore Today&apos;s Sessions
           </Link>
         </div>
 

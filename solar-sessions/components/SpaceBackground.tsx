@@ -2,7 +2,7 @@
 
 import { useRef, useEffect } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Stars, Sphere } from "@react-three/drei";
+import { Stars, Sphere, PerspectiveCamera } from "@react-three/drei";
 import * as THREE from "three";
 
 function SpaceField() {
@@ -103,7 +103,7 @@ function CameraController() {
   });
 
   return (
-    <perspectiveCamera
+    <PerspectiveCamera
       ref={cameraRef}
       position={[0, 0, 100]}
       fov={75}

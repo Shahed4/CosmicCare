@@ -164,7 +164,7 @@ export default function LoginPage() {
             fontSize: '0.8rem',
             color: 'rgba(255, 255, 255, 0.5)'
           }}>
-            Don't have a display name? <Link href="/signup" style={{ color: '#ffd700', textDecoration: 'none' }}>Sign up</Link> to set one
+            Don&apos;t have a display name? <Link href="/signup" style={{ color: '#ffd700', textDecoration: 'none' }}>Sign up</Link> to set one
           </p>
         </div>
 
@@ -334,7 +334,7 @@ export default function LoginPage() {
           fontSize: '0.9rem',
           color: 'rgba(255, 255, 255, 0.6)'
         }}>
-          Don't have an account?{' '}
+          Don&apos;t have an account?{' '}
           <Link 
             href="/signup"
             style={{

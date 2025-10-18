@@ -19,8 +19,9 @@ export async function transcribeAudio(audioFile: File): Promise<string> {
 
     const text = typeof result === 'string' ? result : (result.text || "");
     return text.trim();
-  } catch (error: any) {
-    console.error("Whisper API Error:", error.message || error);
-    throw new Error(`Transcription failed: ${error.message || error}`);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error("Whisper API Error:", message);
+    throw new Error(`Transcription failed: ${message}`);
   }
 }

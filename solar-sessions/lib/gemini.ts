@@ -59,8 +59,9 @@ Suggestion:`;
       confidence: intensity,
       suggestions,
     };
-  } catch (error: any) {
-    console.error("Gemini API Error:", error.message);
-    throw new Error(`Emotion analysis failed: ${error.message}`);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error("Gemini API Error:", message);
+    throw new Error(`Emotion analysis failed: ${message}`);
   }
 }
