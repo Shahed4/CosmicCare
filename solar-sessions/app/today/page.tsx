@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../contexts/AuthContext";
-import { fetchSessionsForDate } from "../../lib/database";
+import { fetchSessionsForDate, getTodayLocalDateString } from "../../lib/database";
 
 const SolarScene = dynamic(() => import("../../components/SolarScene"), {
   ssr: false,
@@ -76,8 +76,8 @@ export default function TodayPage() {
       setError(null);
 
       try {
-        // Get today's date in YYYY-MM-DD format
-        const today = new Date().toISOString().split("T")[0];
+        // Get today's date in YYYY-MM-DD format (local time)
+        const today = getTodayLocalDateString();
 
         const data = await fetchSessionsForDate(user.id, today);
 
@@ -256,7 +256,7 @@ export default function TodayPage() {
 
   // Show empty state if no sessions for today
   if (!dayData || dayData.sessions.length === 0) {
-    const today = new Date().toISOString().split("T")[0];
+    const today = getTodayLocalDateString();
     return (
       <main style={{ height: "100vh", background: "black" }}>
         <SunOnlyScene
