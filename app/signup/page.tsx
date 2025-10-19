@@ -102,7 +102,7 @@ export default function SignupPage() {
   };
 
   return (
-    <div style={{
+    <div className="auth-page" style={{
       minHeight: '100vh',
       background: 'linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%)',
       display: 'flex',
@@ -132,7 +132,7 @@ export default function SignupPage() {
         pointerEvents: 'none'
       }} />
 
-      <div style={{
+      <div className="auth-card" style={{
         width: '100%',
         maxWidth: '400px',
         background: 'rgba(12, 12, 12, 0.95)',
@@ -466,7 +466,7 @@ export default function SignupPage() {
         </div>
       </div>
 
-      {/* CSS Animations */}
+      {/* CSS Animations & Responsive */}
       <style jsx>{`
         @keyframes twinkle {
           0%, 100% { opacity: 0.3; }
@@ -480,6 +480,13 @@ export default function SignupPage() {
           to {
             transform: rotate(360deg);
           }
+        }
+
+        @media (max-width: 480px) {
+          .auth-page { padding: 1rem; }
+          .auth-card { padding: 1.5rem !important; border-radius: 16px; }
+          .auth-card h1 { font-size: 1.75rem !important; }
+          .auth-card h2 { font-size: 1.25rem !important; }
         }
       `}</style>
     </div>

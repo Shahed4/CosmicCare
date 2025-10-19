@@ -64,7 +64,7 @@ export default function Recorder({ onRecordingComplete, isProcessing }: Recorder
   };
 
   return (
-    <div style={{
+    <div className="recorder" style={{
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
@@ -90,6 +90,7 @@ export default function Recorder({ onRecordingComplete, isProcessing }: Recorder
 
       {/* Record Button */}
       <button
+        className="record-btn"
         onClick={isRecording ? stopRecording : startRecording}
         disabled={isProcessing}
         style={{
@@ -145,6 +146,13 @@ export default function Recorder({ onRecordingComplete, isProcessing }: Recorder
           50% {
             opacity: 0.5;
           }
+        }
+
+        @media (max-width: 480px) {
+          .recorder { padding: 1rem; gap: 1.25rem; }
+          .record-btn { width: 96px !important; height: 96px !important; font-size: 1rem !important; }
+          .recorder :global(div[style*='font-family: monospace']) { font-size: 2rem !important; }
+          .recorder p { font-size: 0.95rem !important; max-width: 260px; }
         }
       `}</style>
     </div>
