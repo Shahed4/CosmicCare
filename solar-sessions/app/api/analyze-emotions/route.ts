@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { fetchEmotions, DatabaseEmotion } from "../../../lib/database";
+import { createAuthenticatedSupabaseClient } from "@/lib/auth-server";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
@@ -23,6 +24,9 @@ interface AnalysisResult {
  */
 export async function POST(request: NextRequest) {
   try {
+    // Authenticate user
+    const { supabase } = await createAuthenticatedSupabaseClient(request);
+    
     const { text } = await request.json();
 
     // Validate input
@@ -38,10 +42,10 @@ export async function POST(request: NextRequest) {
 
     console.log(`[INFO] Analyzing emotions for text: "${text.substring(0, 50)}..."`);
 
-    // Fetch available emotions from database
+    // Fetch available emotions from database using authenticated client
     let emotions: DatabaseEmotion[];
     try {
-      emotions = await fetchEmotions();
+      emotions = await fetchEmotions(supabase);
       if (!emotions || emotions.length === 0) {
         return NextResponse.json(
           {

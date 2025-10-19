@@ -10,3 +10,14 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     detectSessionInUrl: true
   }
 })
+
+// Server-side Supabase client for API routes
+export const createServerSupabaseClient = (accessToken?: string) => {
+  return createClient(supabaseUrl, supabaseAnonKey, {
+    global: {
+      headers: accessToken ? {
+        Authorization: `Bearer ${accessToken}`
+      } : {}
+    }
+  })
+}

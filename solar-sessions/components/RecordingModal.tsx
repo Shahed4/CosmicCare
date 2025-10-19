@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
+import { supabase } from "../lib/supabase";
 
 interface RecordingModalProps {
   isOpen: boolean;
@@ -179,11 +180,24 @@ export default function RecordingModal({ isOpen, onClose }: RecordingModalProps)
     setError("");
 
     try {
+      if (!user) {
+        setError("User not authenticated");
+        return;
+      }
+
+      // Get the current session token
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        setError("No valid session found");
+        return;
+      }
+
       // Step 1: Analyze emotions
       const analysisResponse = await fetch("/api/analyze-emotions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({ text }),
       });
@@ -196,17 +210,13 @@ export default function RecordingModal({ isOpen, onClose }: RecordingModalProps)
       }
 
       // Step 2: Auto-save session
-      if (!user) {
-        setError("User not authenticated");
-        return;
-      }
-
       setIsSaving(true);
 
       const saveResponse = await fetch("/api/save-session", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({
           session_name: analysisData.session_name,
@@ -215,7 +225,6 @@ export default function RecordingModal({ isOpen, onClose }: RecordingModalProps)
             emotion_id: e.emotion_id,
             intensity: e.intensity,
           })),
-          user_id: user.id,
         }),
       });
 

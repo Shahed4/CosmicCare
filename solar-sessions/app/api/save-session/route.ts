@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSessionWithEmotions } from "@/lib/database";
-import { useAuth } from "@/contexts/AuthContext";
+import { createAuthenticatedSupabaseClient } from "@/lib/auth-server";
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -12,7 +12,6 @@ interface SaveSessionRequest {
     emotion_id: number;
     intensity: number;
   }>;
-  user_id: string;
 }
 
 /**
@@ -21,14 +20,17 @@ interface SaveSessionRequest {
  */
 export async function POST(request: NextRequest) {
   try {
-    const { session_name, transcript, emotions, user_id }: SaveSessionRequest = await request.json();
+    // Authenticate user
+    const { supabase, user } = await createAuthenticatedSupabaseClient(request);
+    
+    const { session_name, transcript, emotions }: SaveSessionRequest = await request.json();
 
     // Validate input
-    if (!session_name || !transcript || !emotions || !user_id) {
+    if (!session_name || !transcript || !emotions) {
       return NextResponse.json(
         {
           error: true,
-          message: "Missing required fields: session_name, transcript, emotions, user_id",
+          message: "Missing required fields: session_name, transcript, emotions",
         },
         { status: 400 }
       );
@@ -65,15 +67,16 @@ export async function POST(request: NextRequest) {
     ];
     const randomColor = colors[Math.floor(Math.random() * colors.length)];
 
-    console.log(`[INFO] Saving session: "${session_name}" for user ${user_id}`);
+    console.log(`[INFO] Saving session: "${session_name}" for user ${user.id}`);
 
-    // Create session with emotions
+    // Create session with emotions using authenticated client
     const result = await createSessionWithEmotions(
-      user_id,
+      user.id,
       session_name,
       transcript,
       randomColor,
-      emotions
+      emotions,
+      supabase
     );
 
     if (!result.success) {
