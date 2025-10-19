@@ -4,7 +4,10 @@ import dynamic from "next/dynamic";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../contexts/AuthContext";
-import { fetchSessionsForDate, getTodayLocalDateString } from "../../lib/database";
+import {
+  fetchSessionsForDate,
+  getTodayLocalDateString,
+} from "../../lib/database";
 
 const SolarScene = dynamic(() => import("../../components/SolarScene"), {
   ssr: false,
@@ -51,7 +54,9 @@ export default function TodayPage() {
 
   // Format date for display
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
+    // Parse the date string in local timezone to avoid UTC conversion issues
+    const [year, month, day] = dateString.split("-").map(Number);
+    const date = new Date(year, month - 1, day); // month is 0-indexed
     return date.toLocaleDateString("en-US", {
       weekday: "long",
       year: "numeric",
@@ -268,9 +273,10 @@ export default function TodayPage() {
   }
 
   // Only render the protected content if user is authenticated and data is loaded
+  const today = getTodayLocalDateString();
   return (
     <main style={{ height: "100vh", background: "black" }}>
-      <SolarScene data={dayData} headline={formatDate(dayData.date)} />
+      <SolarScene data={dayData} headline={formatDate(today)} />
     </main>
   );
 }
