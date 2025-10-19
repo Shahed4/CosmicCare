@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { createSessionWithEmotions } from "@/lib/database";
 import { createAuthenticatedSupabaseClient } from "@/lib/auth-server";
 
-export const runtime = 'nodejs';
 export const maxDuration = 60;
 
 interface SaveSessionRequest {

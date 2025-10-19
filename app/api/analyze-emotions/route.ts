@@ -5,7 +5,6 @@ import { createAuthenticatedSupabaseClient } from "@/lib/auth-server";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
-export const runtime = 'nodejs';
 export const maxDuration = 60;
 
 interface EmotionSelection {
