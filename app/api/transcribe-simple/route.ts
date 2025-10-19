@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { transcribeAudio } from "@/lib/whisper";
 
-export const runtime = 'nodejs';
 export const maxDuration = 60;
 
 /**
