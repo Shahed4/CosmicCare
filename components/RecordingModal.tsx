@@ -283,6 +283,7 @@ export default function RecordingModal({ isOpen, onClose }: RecordingModalProps)
       >
         {/* Modal */}
         <div
+          className="recording-modal"
           style={{
             background: "linear-gradient(135deg, rgba(15, 15, 25, 0.98), rgba(25, 25, 40, 0.98))",
             backdropFilter: "blur(25px)",
@@ -672,7 +673,7 @@ export default function RecordingModal({ isOpen, onClose }: RecordingModalProps)
         </div>
       </div>
 
-      {/* CSS Animations */}
+      {/* CSS Animations & Responsive */}
       <style jsx>{`
         @keyframes fadeIn {
           from {
@@ -731,6 +732,27 @@ export default function RecordingModal({ isOpen, onClose }: RecordingModalProps)
         
         div::-webkit-scrollbar-thumb:hover {
           background: rgba(78, 205, 196, 0.7);
+        }
+
+        @media (max-width: 600px) {
+          .recording-modal {
+            position: fixed !important;
+            inset: 0 !important;
+            max-width: 100% !important;
+            width: 100vw !important;
+            height: 100svh !important;
+            height: 100dvh !important; /* fallback */
+            height: 100vh !important; /* fallback */
+            max-height: 100svh !important;
+            margin: 0 !important;
+            padding: 24px !important;
+            border-radius: 0;
+            box-sizing: border-box !important;
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch;
+            padding-top: calc(1rem + env(safe-area-inset-top)) !important;
+            padding-bottom: calc(1rem + env(safe-area-inset-bottom)) !important;
+          }
         }
       `}</style>
     </>

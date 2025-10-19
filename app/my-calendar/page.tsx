@@ -319,7 +319,7 @@ export default function MyCalendarPage() {
   const calendarDays = createCalendarGrid();
 
   return (
-    <div style={{
+    <div className="calendar-page" style={{
       minHeight: "100vh",
       background: "linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%)",
       paddingTop: "100px", // Account for navbar
@@ -481,7 +481,7 @@ export default function MyCalendarPage() {
         </div>
 
         {/* Calendar Grid */}
-        <div style={{
+        <div className="calendar-grid" style={{
           background: "rgba(255, 255, 255, 0.05)",
           backdropFilter: "blur(10px)",
           borderRadius: "16px",
@@ -489,7 +489,7 @@ export default function MyCalendarPage() {
           border: "1px solid rgba(255, 255, 255, 0.1)"
         }}>
           {/* Days of week header */}
-          <div style={{
+          <div className="dow" style={{
             display: "grid",
             gridTemplateColumns: "repeat(7, 1fr)",
             gap: "0.5rem",
@@ -509,7 +509,7 @@ export default function MyCalendarPage() {
           </div>
 
           {/* Calendar days */}
-          <div style={{
+          <div className="days" style={{
             display: "grid",
             gridTemplateColumns: "repeat(7, 1fr)",
             gap: "0.5rem"
@@ -743,6 +743,15 @@ export default function MyCalendarPage() {
           </div>
         )}
       </div>
+      <style jsx>{`
+        @media (max-width: 480px) {
+          .calendar-page { padding: 80px 1rem 1rem 1rem !important; }
+          .calendar-grid { padding: 1rem !important; }
+          .dow { gap: 0.25rem !important; }
+          .days { gap: 0.25rem !important; }
+          .calendar-page h1 { font-size: 1.75rem !important; }
+        }
+      `}</style>
     </div>
   );
 }

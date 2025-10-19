@@ -114,7 +114,7 @@ export default function SunOnlyScene({ headline, onRecordSession }: Props) {
 
   return (
     <>
-      {/* CSS Animations */}
+      {/* CSS Animations & Responsive */}
       <style jsx>{`
         @keyframes fadeInUp {
           from {
@@ -144,6 +144,28 @@ export default function SunOnlyScene({ headline, onRecordSession }: Props) {
           }
           50% {
             transform: translateY(-10px);
+          }
+        }
+
+        /* Ensure recording modal behaves as full-screen sheet on small screens */
+        @media (max-width: 600px) {
+          :global(.recording-modal) {
+            position: fixed !important;
+            inset: 0 !important;
+            max-width: 100% !important;
+            width: 100vw !important;
+            height: 100svh !important;
+            height: 100dvh !important; /* fallback */
+            height: 100vh !important; /* fallback */
+            max-height: 100svh !important;
+            margin: 0 !important;
+            padding: 24px !important;
+            border-radius: 0 !important;
+            box-sizing: border-box !important;
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+            padding-top: calc(1rem + env(safe-area-inset-top)) !important;
+            padding-bottom: calc(1rem + env(safe-area-inset-bottom)) !important;
           }
         }
       `}</style>

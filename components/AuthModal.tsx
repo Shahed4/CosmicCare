@@ -78,7 +78,7 @@ export default function AuthModal({ isOpen, onClose, mode, onModeChange }: AuthM
       boxSizing: 'border-box',
       animation: 'fadeIn 0.3s ease-out'
     }}>
-      <div style={{
+      <div className="auth-modal" style={{
         background: 'linear-gradient(135deg, rgba(12, 12, 12, 0.95) 0%, rgba(26, 26, 46, 0.95) 50%, rgba(22, 33, 62, 0.95) 100%)',
         border: '1px solid rgba(255, 215, 0, 0.3)',
         borderRadius: '20px',
@@ -416,7 +416,7 @@ export default function AuthModal({ isOpen, onClose, mode, onModeChange }: AuthM
         </div>
       </div>
 
-      {/* CSS Animations */}
+      {/* CSS Animations & Responsive */}
       <style jsx>{`
         @keyframes fadeIn {
           from {
@@ -449,6 +449,27 @@ export default function AuthModal({ isOpen, onClose, mode, onModeChange }: AuthM
           }
           to {
             transform: rotate(360deg);
+          }
+        }
+
+        @media (max-width: 600px) {
+          .auth-modal {
+            position: fixed !important;
+            inset: 0 !important;
+            max-width: 100% !important;
+            width: 100vw !important;
+            height: 100svh !important;
+            height: 100dvh !important; /* fallback */
+            height: 100vh !important; /* fallback */
+            min-height: 100svh !important;
+            margin: 0 !important;
+            padding: 1.25rem !important;
+            border-radius: 0 !important;
+            box-sizing: border-box !important;
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch;
+            padding-top: calc(1rem + env(safe-area-inset-top)) !important;
+            padding-bottom: calc(1rem + env(safe-area-inset-bottom)) !important;
           }
         }
       `}</style>

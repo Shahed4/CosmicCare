@@ -43,7 +43,7 @@ export default function NavBar() {
   };
 
   return (
-    <nav style={{
+    <nav className="navbar" style={{
       position: "fixed",
       top: 0,
       left: 0,
@@ -351,6 +351,15 @@ export default function NavBar() {
           }
           nav > button {
             display: block !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .navbar {
+            padding-left: calc(1rem + env(safe-area-inset-left)) !important;
+            padding-right: calc(1rem + env(safe-area-inset-right)) !important;
+            padding-top: calc(0.75rem + env(safe-area-inset-top)) !important;
+            padding-bottom: 0.75rem !important;
           }
         }
       `}</style>

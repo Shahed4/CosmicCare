@@ -120,7 +120,7 @@ export default function SolarScene({ data, headline }: Props) {
   }
   return (
     <>
-      {/* CSS Animations */}
+      {/* CSS Animations & Responsive */}
       <style jsx>{`
         @keyframes slideInRight {
           from {
@@ -174,6 +174,43 @@ export default function SolarScene({ data, headline }: Props) {
           to {
             opacity: 0;
             transform: scale(0.95);
+          }
+        }
+
+        /* Mobile responsive full-screen modals */
+        @media (max-width: 600px) {
+          .planet-modal,
+          .sun-modal {
+            position: fixed !important;
+            inset: 0 !important;
+            width: 100vw !important;
+            height: 100svh !important;
+            height: 100dvh !important; /* fallback */
+            height: 100vh !important; /* fallback */
+            max-width: 100% !important;
+            padding: 16px !important;
+            padding-top: calc(16px + env(safe-area-inset-top)) !important;
+            padding-bottom: calc(16px + env(safe-area-inset-bottom)) !important;
+            border-left: none !important;
+            border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            z-index: 1003 !important;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+            -webkit-overflow-scrolling: touch !important;
+            background-clip: padding-box !important;
+            box-sizing: border-box !important;
+          }
+
+          /* Slightly reduce heading sizes within mobile sheets */
+          .planet-modal h2, .sun-modal h2 { font-size: 22px !important; }
+          .planet-modal h3, .sun-modal h3 { font-size: 16px !important; }
+
+          /* Ensure all inner content never exceeds viewport width */
+          .planet-modal *, .sun-modal * {
+            max-width: 100vw !important;
+            box-sizing: border-box !important;
           }
         }
       `}</style>
@@ -304,6 +341,7 @@ export default function SolarScene({ data, headline }: Props) {
       {/* Enhanced Planet Details Modal */}
       {(selectedPlanet || isClosingPlanetModal) && (
         <div
+          className="planet-modal"
           style={{
             position: "fixed",
             right: 0,
@@ -1154,6 +1192,7 @@ export default function SolarScene({ data, headline }: Props) {
       {/* Enhanced Sun Analysis Modal */}
       {(sunModalOpen || isClosingSunModal) && (
         <div
+          className="sun-modal"
           style={{
             position: "fixed",
             right: 0,
