@@ -17,6 +17,7 @@ import { EffectComposer, Bloom } from "@react-three/postprocessing";
 import { useMemo, useRef, useState, useEffect } from "react";
 import * as React from "react";
 import type { DayData, Session, Emotion } from "../constants/today";
+import RecordingModal from "./RecordingModal";
 
 type Props = { data: DayData; headline: string };
 
@@ -33,6 +34,7 @@ export default function SolarScene({ data, headline }: Props) {
   const [sunHovered, setSunHovered] = useState(false);
   const [initialCameraPosition, setInitialCameraPosition] =
     useState<THREE.Vector3 | null>(null);
+  const [isRecordingModalOpen, setIsRecordingModalOpen] = useState(false);
 
   const handleCloseModal = () => {
     setIsClosingPlanetModal(true);
@@ -246,6 +248,57 @@ export default function SolarScene({ data, headline }: Props) {
             Planets pause for 5s after hover
           </div>
         </div>
+      </div>
+
+      {/* Floating Plus Button for Adding Sessions */}
+      <div
+        style={{
+          position: "fixed",
+          right: "24px",
+          bottom: "24px",
+          zIndex: 20,
+          userSelect: "none",
+        }}
+      >
+        <button
+          onClick={() => setIsRecordingModalOpen(true)}
+          style={{
+            width: "64px",
+            height: "64px",
+            borderRadius: "50%",
+            background: "linear-gradient(135deg, #ff6b6b, #ee5a52)",
+            border: "1px solid rgba(255, 255, 255, 0.1)",
+            color: "white",
+            fontSize: "28px",
+            cursor: "pointer",
+            boxShadow: "0 8px 25px rgba(255, 107, 107, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)",
+            transition: "all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)",
+            position: "relative",
+            overflow: "hidden",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            backdropFilter: "blur(10px)",
+          }}
+          onMouseOver={(e) => {
+            e.currentTarget.style.transform = "scale(1.1)";
+            e.currentTarget.style.boxShadow = "0 12px 35px rgba(255, 107, 107, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.3)";
+          }}
+          onMouseOut={(e) => {
+            e.currentTarget.style.transform = "scale(1)";
+            e.currentTarget.style.boxShadow = "0 8px 25px rgba(255, 107, 107, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)";
+          }}
+        >
+          <div style={{ 
+            position: "absolute", 
+            top: 0, 
+            left: 0, 
+            right: 0, 
+            bottom: 0,
+            background: "radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3), transparent 50%)",
+          }} />
+          +
+        </button>
       </div>
 
       {/* Enhanced Planet Details Modal */}
@@ -1738,6 +1791,12 @@ export default function SolarScene({ data, headline }: Props) {
           />
         </Bvh>
       </Canvas>
+
+      {/* Recording Modal */}
+      <RecordingModal 
+        isOpen={isRecordingModalOpen} 
+        onClose={() => setIsRecordingModalOpen(false)} 
+      />
     </>
   );
 }
