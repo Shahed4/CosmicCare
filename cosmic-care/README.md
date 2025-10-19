@@ -21,7 +21,7 @@ This README is focused on the Rant & Reflect integration and how to run it local
 
 ## Environment variables
 
-Create a `.env.local` in the `solar-sessions` folder with the following variables (or set them in your hosting platform):
+Create a `.env.local` in the `cosmic-care` folder with the following variables (or set them in your hosting platform):
 
 ```
 OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -36,7 +36,7 @@ For convenience, a `.env.example` is included alongside this README.
 1. Install dependencies
 
 ```bash
-# From the solar-sessions folder
+# From the cosmic-care folder
 npm install
 # or
 pnpm install
@@ -135,7 +135,7 @@ An AI-driven self-therapy tool that allows users to:
 ## 📂 **Project Structure**
 
 ```
-solar-sessions/
+cosmic-care/
 │
 ├── app/
 │   ├── page.tsx                        # Home page
@@ -193,7 +193,7 @@ solar-sessions/
 1. **Clone the repository**
    ```bash
    git clone https://github.com/yourusername/CosmicCare.git
-   cd CosmicCare/solar-sessions
+   cd CosmicCare/cosmic-care
    ```
 
 2. **Install dependencies**
