@@ -1316,17 +1316,21 @@ export default function SolarScene({ data, headline }: Props) {
                   opacity: 0.9,
                   fontWeight: 600,
                   color: "#ffd27f",
+                  lineHeight: "1.3",
+                  wordWrap: "break-word",
+                  overflowWrap: "break-word",
                 }}
               >
-                Positive vs Negative Emotion Distribution
+                Emotion Distribution
               </div>
               <div
                 style={{
                   display: "flex",
-                  justifyContent: "space-between",
+                  justifyContent: "space-around",
                   alignItems: "end",
-                  height: "140px",
-                  padding: "0 8px",
+                  height: "180px",
+                  padding: "0 4px",
+                  gap: "8px",
                 }}
               >
                 {data.sessions.map((session, index) => {
@@ -1416,11 +1420,15 @@ export default function SolarScene({ data, headline }: Props) {
                       />
                       <div
                         style={{
-                          fontSize: "12px",
+                          fontSize: "11px",
                           fontWeight: 600,
                           textAlign: "center",
                           marginTop: "12px",
                           marginBottom: "6px",
+                          lineHeight: "1.2",
+                          wordWrap: "break-word",
+                          overflowWrap: "break-word",
+                          maxWidth: "100%",
                         }}
                       >
                         {session.name}
