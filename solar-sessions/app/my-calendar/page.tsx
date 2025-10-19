@@ -32,15 +32,16 @@ export default function MyCalendarPage() {
       setError(null);
 
       try {
-        // Get selected month's start and end dates
+        // Get selected month's start and end dates (local time)
         const year = currentMonth.getFullYear();
         const month = currentMonth.getMonth();
         
         const startDate = new Date(year, month, 1);
         const endDate = new Date(year, month + 1, 0); // Last day of current month
         
-        const startDateString = startDate.toISOString().split('T')[0];
-        const endDateString = endDate.toISOString().split('T')[0];
+        // Format dates as YYYY-MM-DD using local time
+        const startDateString = `${year}-${String(month + 1).padStart(2, '0')}-01`;
+        const endDateString = `${year}-${String(month + 1).padStart(2, '0')}-${String(endDate.getDate()).padStart(2, '0')}`;
         
         const data = await fetchSessionsForDateRange(user.id, startDateString, endDateString);
         

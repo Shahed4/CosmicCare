@@ -53,6 +53,37 @@ export interface DayData {
   sessions: Session[];
 }
 
+// Utility function to get local date string from timestampz
+function getLocalDateString(timestampz: string): string {
+  const date = new Date(timestampz);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+// Utility function to get today's date in YYYY-MM-DD format (local time)
+export function getTodayLocalDateString(): string {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+// Utility function to create local date range for database queries
+function createLocalDateRange(dateString: string): { start: string; end: string } {
+  const date = new Date(dateString + 'T00:00:00'); // Local midnight
+  const startOfDay = new Date(date);
+  const endOfDay = new Date(date);
+  endOfDay.setHours(23, 59, 59, 999);
+  
+  return {
+    start: startOfDay.toISOString(),
+    end: endOfDay.toISOString()
+  };
+}
+
 // Utility function to transform database data to match your existing structure
 export function transformDatabaseSessionToSession(dbSession: DatabaseSession): Session {
   const emotions: SessionEmotions = {
@@ -77,7 +108,7 @@ export function transformDatabaseSessionToSession(dbSession: DatabaseSession): S
 
   return {
     id: dbSession.id,
-    date: dbSession.created_at.split('T')[0], // Extract date from timestamp
+    date: getLocalDateString(dbSession.created_at), // Extract local date from timestamp
     name: dbSession.name,
     color: dbSession.color,
     emotions
@@ -86,8 +117,7 @@ export function transformDatabaseSessionToSession(dbSession: DatabaseSession): S
 
 // Fetch sessions for a specific date
 export async function fetchSessionsForDate(userId: string, date: string): Promise<DayData | null> {
-  const startOfDay = `${date}T00:00:00.000Z`;
-  const endOfDay = `${date}T23:59:59.999Z`;
+  const { start, end } = createLocalDateRange(date);
 
   const { data, error } = await supabase
     .from('sessions')
@@ -99,8 +129,8 @@ export async function fetchSessionsForDate(userId: string, date: string): Promis
       )
     `)
     .eq('user_id', userId)
-    .gte('created_at', startOfDay)
-    .lte('created_at', endOfDay)
+    .gte('created_at', start)
+    .lte('created_at', end)
     .order('created_at', { ascending: true });
 
   if (error) {
@@ -126,8 +156,8 @@ export async function fetchSessionsForDateRange(
   startDate: string, 
   endDate: string
 ): Promise<DayData[]> {
-  const startOfRange = `${startDate}T00:00:00.000Z`;
-  const endOfRange = `${endDate}T23:59:59.999Z`;
+  const startRange = createLocalDateRange(startDate);
+  const endRange = createLocalDateRange(endDate);
 
   const { data, error } = await supabase
     .from('sessions')
@@ -139,8 +169,8 @@ export async function fetchSessionsForDateRange(
       )
     `)
     .eq('user_id', userId)
-    .gte('created_at', startOfRange)
-    .lte('created_at', endOfRange)
+    .gte('created_at', startRange.start)
+    .lte('created_at', endRange.end)
     .order('created_at', { ascending: true });
 
   if (error) {
@@ -152,11 +182,11 @@ export async function fetchSessionsForDateRange(
     return [];
   }
 
-  // Group sessions by date
+  // Group sessions by local date
   const sessionsByDate = new Map<string, DatabaseSession[]>();
   
   data.forEach(session => {
-    const date = session.created_at.split('T')[0];
+    const date = getLocalDateString(session.created_at);
     if (!sessionsByDate.has(date)) {
       sessionsByDate.set(date, []);
     }
