@@ -45,6 +45,7 @@ export interface Session {
   date: string;
   name: string;
   color: string;
+  transcript: string | null;
   emotions: SessionEmotions;
 }
 
@@ -111,6 +112,7 @@ export function transformDatabaseSessionToSession(dbSession: DatabaseSession): S
     date: getLocalDateString(dbSession.created_at), // Extract local date from timestamp
     name: dbSession.name,
     color: dbSession.color,
+    transcript: dbSession.transcript,
     emotions
   };
 }

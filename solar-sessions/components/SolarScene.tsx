@@ -972,6 +972,76 @@ export default function SolarScene({ data, headline }: Props) {
                 })()}
             </div>
           </div>
+
+          {/* Session Transcript */}
+          {selectedPlanet?.transcript && (
+            <div style={{ marginTop: "32px", marginBottom: "24px" }}>
+              <h3
+                style={{
+                  margin: "0 0 20px 0",
+                  fontSize: "18px",
+                  fontWeight: 600,
+                  opacity: 0.9,
+                  color: "#ffffff",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "12px",
+                }}
+              >
+                <span
+                  style={{
+                    width: "3px",
+                    height: "18px",
+                    background: `linear-gradient(to bottom, ${
+                      selectedPlanet?.color || "#cccccc"
+                    }, transparent)`,
+                    borderRadius: "2px",
+                  }}
+                />
+                Session Transcript
+              </h3>
+              <div
+                style={{
+                  background: "rgba(255, 255, 255, 0.05)",
+                  border: "1px solid rgba(255, 255, 255, 0.1)",
+                  borderRadius: "12px",
+                  padding: "20px",
+                  backdropFilter: "blur(10px)",
+                  transition: "all 0.3s ease",
+                  cursor: "pointer",
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.background = "rgba(255, 255, 255, 0.08)";
+                  e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.2)";
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                  e.currentTarget.style.boxShadow =
+                    "0 6px 20px rgba(0, 0, 0, 0.2)";
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.background = "rgba(255, 255, 255, 0.05)";
+                  e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.1)";
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = "none";
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: "14px",
+                    lineHeight: "1.6",
+                    color: "#ffffff",
+                    opacity: 0.9,
+                    fontStyle: "italic",
+                    textAlign: "left",
+                    whiteSpace: "pre-wrap",
+                    wordWrap: "break-word",
+                  }}
+                >
+                  "{selectedPlanet.transcript}"
+                </div>
+              </div>
+            </div>
+          )}
+
           <div
             style={{
               marginTop: "32px",
