@@ -13,6 +13,8 @@ import {
 import { EffectComposer, Bloom } from "@react-three/postprocessing";
 import { useRef, useState } from "react";
 import * as React from "react";
+import RecordingModal from "./RecordingModal";
+import { useThree } from "@react-three/fiber";
 
 type Props = {
   headline: string;
@@ -22,6 +24,12 @@ type Props = {
 export default function SunOnlyScene({ headline, onRecordSession }: Props) {
   const [contextLost, setContextLost] = useState(false);
   const [key, setKey] = useState(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isZooming, setIsZooming] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const cameraControllerRef = useRef<{ isAnimating: () => boolean } | null>(
+    null
+  );
 
   const handleContextLost = () => {
     console.warn("WebGL context lost, attempting to restore...");
@@ -32,6 +40,34 @@ export default function SunOnlyScene({ headline, onRecordSession }: Props) {
     console.log("WebGL context restored");
     setContextLost(false);
     setKey((prev) => prev + 1); // Force re-render
+  };
+
+  const handleSunClick = () => {
+    // Prevent clicking if already animating or modal is open
+    if (
+      isAnimating ||
+      isModalOpen ||
+      (cameraControllerRef.current?.isAnimating() ?? false)
+    )
+      return;
+
+    setIsAnimating(true);
+    setIsZooming(true);
+    // Wait for zoom animation to complete before opening modal
+    setTimeout(() => {
+      setIsModalOpen(true);
+      setIsAnimating(false);
+    }, 1500); // 1.5 second zoom animation
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setIsAnimating(true);
+    // Start zoom out animation
+    setTimeout(() => {
+      setIsZooming(false);
+      setIsAnimating(false);
+    }, 100); // Small delay to ensure modal closes first
   };
 
   if (contextLost) {
@@ -214,6 +250,7 @@ export default function SunOnlyScene({ headline, onRecordSession }: Props) {
           minDistance={4}
           maxDistance={80}
           zoomSpeed={0.5}
+          enabled={!isZooming}
         />
         <EffectComposer multisampling={0}>
           <Bloom
@@ -224,27 +261,166 @@ export default function SunOnlyScene({ headline, onRecordSession }: Props) {
         </EffectComposer>
 
         <Bvh>
-          <SunOnlySystem onRecordSession={onRecordSession} />
+          <SunOnlySystem
+            onRecordSession={handleSunClick}
+            isZooming={isZooming}
+            controllerRef={cameraControllerRef}
+          />
         </Bvh>
       </Canvas>
+
+      {/* Recording Modal */}
+      <RecordingModal isOpen={isModalOpen} onClose={handleModalClose} />
     </>
   );
 }
 
-function SunOnlySystem({ onRecordSession }: { onRecordSession: () => void }) {
+function SunOnlySystem({
+  onRecordSession,
+  isZooming,
+  controllerRef,
+}: {
+  onRecordSession: () => void;
+  isZooming: boolean;
+  controllerRef: React.RefObject<{ isAnimating: () => boolean } | null>;
+}) {
   return (
     <group>
-      <Sun onClick={onRecordSession} onHover={() => {}} />
+      <CameraController isZooming={isZooming} controllerRef={controllerRef} />
+      <Sun onClick={onRecordSession} onHover={() => {}} isZooming={isZooming} />
     </group>
   );
+}
+
+function CameraController({
+  isZooming,
+  controllerRef,
+}: {
+  isZooming: boolean;
+  controllerRef: React.RefObject<{ isAnimating: () => boolean } | null>;
+}) {
+  const { camera } = useThree();
+  const animationIdRef = useRef<number | null>(null);
+  const animationStateRef = useRef<"idle" | "zooming-in" | "zooming-out">(
+    "idle"
+  );
+
+  // Expose animation state to parent
+  React.useEffect(() => {
+    if (controllerRef.current) {
+      controllerRef.current.isAnimating = () =>
+        animationStateRef.current !== "idle";
+    }
+  }, [controllerRef]);
+
+  React.useEffect(() => {
+    // Cancel any existing animation
+    if (animationIdRef.current) {
+      cancelAnimationFrame(animationIdRef.current);
+      animationIdRef.current = null;
+    }
+
+    if (isZooming && animationStateRef.current !== "zooming-in") {
+      // Start zoom-in animation
+      animationStateRef.current = "zooming-in";
+
+      const startTime = Date.now();
+      const startPosition = camera.position.clone();
+
+      // Calculate target position based on current direction
+      const currentDirection = startPosition.clone().normalize();
+      const targetDistance = 16; // Distance from sun
+      const targetPosition = currentDirection.multiplyScalar(targetDistance);
+      targetPosition.y = Math.max(targetPosition.y, 2); // Keep minimum height
+
+      const animate = () => {
+        const elapsed = Date.now() - startTime;
+        const duration = 1500; // 1.5 seconds
+        const progress = Math.min(elapsed / duration, 1);
+
+        // Easing function for smooth animation
+        const easeProgress = 1 - Math.pow(1 - progress, 3); // easeOutCubic
+
+        // Interpolate camera position
+        camera.position.lerpVectors(
+          startPosition,
+          targetPosition,
+          easeProgress
+        );
+        camera.lookAt(0, 0, 0);
+
+        if (progress < 1) {
+          animationIdRef.current = requestAnimationFrame(animate);
+        } else {
+          // Animation complete
+          camera.position.copy(targetPosition);
+          camera.lookAt(0, 0, 0);
+          animationStateRef.current = "idle";
+        }
+      };
+
+      animate();
+    } else if (!isZooming && animationStateRef.current !== "zooming-out") {
+      // Start zoom-out animation
+      animationStateRef.current = "zooming-out";
+
+      const startTime = Date.now();
+      const startPosition = camera.position.clone();
+
+      // Calculate return position based on current direction
+      const currentDirection = startPosition.clone().normalize();
+      const returnDistance = 24; // Original distance
+      const targetPosition = currentDirection.multiplyScalar(returnDistance);
+      targetPosition.y = Math.max(targetPosition.y, 8); // Keep original height
+
+      const animate = () => {
+        const elapsed = Date.now() - startTime;
+        const duration = 1200; // 1.2 seconds
+        const progress = Math.min(elapsed / duration, 1);
+
+        const easeProgress = 1 - Math.pow(1 - progress, 3);
+
+        camera.position.lerpVectors(
+          startPosition,
+          targetPosition,
+          easeProgress
+        );
+        camera.lookAt(0, 0, 0);
+
+        if (progress < 1) {
+          animationIdRef.current = requestAnimationFrame(animate);
+        } else {
+          // Animation complete
+          camera.position.copy(targetPosition);
+          camera.lookAt(0, 0, 0);
+          animationStateRef.current = "idle";
+        }
+      };
+
+      animate();
+    }
+  }, [isZooming, camera]);
+
+  // Cleanup effect
+  React.useEffect(() => {
+    return () => {
+      if (animationIdRef.current) {
+        cancelAnimationFrame(animationIdRef.current);
+      }
+    };
+  }, []);
+
+  return null; // This component doesn't render anything
 }
 
 function Sun({
   onClick,
   onHover,
+  isZooming,
 }: {
   onClick?: () => void;
   onHover?: (hovered: boolean) => void;
+  isZooming: boolean;
 }) {
   const mesh = useRef<THREE.Mesh>(null);
   const [hovered, setHovered] = useState(false);
@@ -264,13 +440,16 @@ function Sun({
     onHover?.(false);
   };
 
+  // Calculate scale based on zoom state
+  const scale = isZooming ? 3 : 1;
+
   return (
     <group
       onClick={onClick}
       onPointerOver={handlePointerOver}
       onPointerOut={handlePointerOut}
     >
-      <mesh ref={mesh}>
+      <mesh ref={mesh} scale={[scale, scale, scale]}>
         <sphereGeometry args={[1.25, 32, 32]} />
         <meshStandardMaterial
           emissive={"#ffdf80"}
@@ -281,14 +460,14 @@ function Sun({
         />
       </mesh>
 
-      {/* Enhanced glow effect when hovered */}
-      {hovered && (
-        <mesh>
-          <sphereGeometry args={[1.5, 32, 32]} />
+      {/* Enhanced glow effect when hovered or zooming */}
+      {(hovered || isZooming) && (
+        <mesh scale={[scale, scale, scale]}>
+          <sphereGeometry args={[1.3125, 32, 32]} />
           <meshBasicMaterial
             color="#ffd700"
             transparent
-            opacity={0.3}
+            opacity={isZooming ? 0.5 : 0.3}
             side={THREE.BackSide}
           />
         </mesh>
@@ -302,7 +481,12 @@ function Sun({
         const z = Math.sin(angle) * radius;
 
         return (
-          <FloatingParticle key={i} position={[x, 0, z]} delay={i * 0.1} />
+          <FloatingParticle
+            key={i}
+            position={[x, 0, z]}
+            delay={i * 0.1}
+            scale={scale}
+          />
         );
       })}
     </group>
@@ -312,9 +496,11 @@ function Sun({
 function FloatingParticle({
   position,
   delay,
+  scale,
 }: {
   position: [number, number, number];
   delay: number;
+  scale: number;
 }) {
   const mesh = useRef<THREE.Mesh>(null);
   useFrame(({ clock }) => {
@@ -325,7 +511,7 @@ function FloatingParticle({
   });
 
   return (
-    <mesh ref={mesh} position={position}>
+    <mesh ref={mesh} position={position} scale={[scale, scale, scale]}>
       <sphereGeometry args={[0.05, 8, 8]} />
       <meshBasicMaterial color="#ffd700" transparent opacity={0.6} />
     </mesh>
