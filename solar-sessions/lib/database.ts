@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabase';
+import { SupabaseClient } from '@supabase/supabase-js';
 
 // Types matching your database schema
 export interface DatabaseEmotion {
@@ -118,10 +119,11 @@ export function transformDatabaseSessionToSession(dbSession: DatabaseSession): S
 }
 
 // Fetch sessions for a specific date
-export async function fetchSessionsForDate(userId: string, date: string): Promise<DayData | null> {
+export async function fetchSessionsForDate(userId: string, date: string, client?: SupabaseClient): Promise<DayData | null> {
   const { start, end } = createLocalDateRange(date);
+  const supabaseClient = client || supabase;
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseClient
     .from('sessions')
     .select(`
       *,
@@ -156,12 +158,14 @@ export async function fetchSessionsForDate(userId: string, date: string): Promis
 export async function fetchSessionsForDateRange(
   userId: string, 
   startDate: string, 
-  endDate: string
+  endDate: string,
+  client?: SupabaseClient
 ): Promise<DayData[]> {
   const startRange = createLocalDateRange(startDate);
   const endRange = createLocalDateRange(endDate);
+  const supabaseClient = client || supabase;
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseClient
     .from('sessions')
     .select(`
       *,
@@ -213,9 +217,12 @@ export async function createSession(
   userId: string,
   name: string,
   transcript: string,
-  color: string
+  color: string,
+  client?: SupabaseClient
 ): Promise<DatabaseSession | null> {
-  const { data, error } = await supabase
+  const supabaseClient = client || supabase;
+  
+  const { data, error } = await supabaseClient
     .from('sessions')
     .insert({
       user_id: userId,
@@ -241,15 +248,17 @@ export async function createSessionEmotions(
   emotions: Array<{
     emotion_id: number;
     intensity: number;
-  }>
+  }>,
+  client?: SupabaseClient
 ): Promise<boolean> {
+  const supabaseClient = client || supabase;
   const sessionEmotionsData = emotions.map(emotion => ({
     session_id: sessionId,
     emotion_id: emotion.emotion_id,
     intensity: emotion.intensity,
   }));
 
-  const { error } = await supabase
+  const { error } = await supabaseClient
     .from('session_emotions')
     .insert(sessionEmotionsData);
 
@@ -270,17 +279,18 @@ export async function createSessionWithEmotions(
   emotions: Array<{
     emotion_id: number;
     intensity: number;
-  }>
+  }>,
+  client?: SupabaseClient
 ): Promise<{ success: boolean; sessionId?: number; error?: string }> {
   try {
     // Create the session
-    const session = await createSession(userId, name, transcript, color);
+    const session = await createSession(userId, name, transcript, color, client);
     if (!session) {
       return { success: false, error: 'Failed to create session' };
     }
 
     // Create the session emotions
-    const emotionsCreated = await createSessionEmotions(session.id, emotions);
+    const emotionsCreated = await createSessionEmotions(session.id, emotions, client);
     if (!emotionsCreated) {
       return { success: false, error: 'Failed to create session emotions' };
     }
@@ -296,8 +306,10 @@ export async function createSessionWithEmotions(
 }
 
 // Fetch all available emotions
-export async function fetchEmotions(): Promise<DatabaseEmotion[]> {
-  const { data, error } = await supabase
+export async function fetchEmotions(client?: SupabaseClient): Promise<DatabaseEmotion[]> {
+  const supabaseClient = client || supabase;
+  
+  const { data, error } = await supabaseClient
     .from('emotions')
     .select('*')
     .order('name', { ascending: true });
