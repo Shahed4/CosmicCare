@@ -532,7 +532,7 @@ export default function MyCalendarPage() {
                   border: selectedDate === day.dateString ? "2px solid #ffd700" : "2px solid transparent",
                   position: "relative"
                 }}
-                onClick={() => day.isCurrentMonth && day.dayData && setSelectedDate(day.dateString)}
+                onClick={() => day.isCurrentMonth && day.dayData && day.dateString && setSelectedDate(day.dateString)}
                 onMouseOver={(e) => {
                   if (day.isCurrentMonth && day.dayData) {
                     e.currentTarget.style.transform = "scale(1.05)";
