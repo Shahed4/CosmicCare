@@ -29,8 +29,6 @@ export default function NavBar() {
   const navItems = [
     { href: "/today", label: "Today's Sessions", icon: "🌌" },
     { href: "/my-calendar", label: "My Calendar", icon: "📅" },
-    { href: "/dummy/today", label: "Today (Demo)", icon: "🌌" },
-    { href: "/dummy/my-calendar", label: "Calendar (Demo)", icon: "📅" },
   ];
 
   const isActive = (href: string) => {

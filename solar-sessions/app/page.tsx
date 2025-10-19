@@ -156,7 +156,7 @@ export default function HomePage() {
           animation: "fadeInUp 1s ease-out 0.6s both"
         }}>
           <Link
-            href="/dummy/today"
+            href="/today"
             style={{
               display: "inline-block",
               background: "linear-gradient(45deg, #ffd700, #ff8c00)",
