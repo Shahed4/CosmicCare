@@ -225,6 +225,7 @@ export default function RecordingModal({ isOpen, onClose }: RecordingModalProps)
             emotion_id: e.emotion_id,
             intensity: e.intensity,
           })),
+          advice: analysisData.advice,
         }),
       });
 

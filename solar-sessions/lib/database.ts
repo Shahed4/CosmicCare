@@ -23,6 +23,7 @@ export interface DatabaseSession {
   name: string;
   audio_file: string | null;
   transcript: string | null;
+  advice: string | null;
   created_at: string;
   color: string;
   session_emotions: DatabaseSessionEmotion[];
@@ -47,6 +48,7 @@ export interface Session {
   name: string;
   color: string;
   transcript: string | null;
+  advice: string | null;
   emotions: SessionEmotions;
 }
 
@@ -114,6 +116,7 @@ export function transformDatabaseSessionToSession(dbSession: DatabaseSession): S
     name: dbSession.name,
     color: dbSession.color,
     transcript: dbSession.transcript,
+    advice: dbSession.advice,
     emotions
   };
 }
@@ -218,6 +221,7 @@ export async function createSession(
   name: string,
   transcript: string,
   color: string,
+  advice: string | null = null,
   client?: SupabaseClient
 ): Promise<DatabaseSession | null> {
   const supabaseClient = client || supabase;
@@ -229,6 +233,7 @@ export async function createSession(
       name: name,
       audio_file: null,
       transcript: transcript,
+      advice: advice,
       color: color,
     })
     .select()
@@ -280,11 +285,12 @@ export async function createSessionWithEmotions(
     emotion_id: number;
     intensity: number;
   }>,
+  advice: string | null = null,
   client?: SupabaseClient
 ): Promise<{ success: boolean; sessionId?: number; error?: string }> {
   try {
     // Create the session
-    const session = await createSession(userId, name, transcript, color, client);
+    const session = await createSession(userId, name, transcript, color, advice, client);
     if (!session) {
       return { success: false, error: 'Failed to create session' };
     }
