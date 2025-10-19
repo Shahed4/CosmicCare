@@ -16,6 +16,7 @@ interface EmotionSelection {
 interface AnalysisResult {
   session_name: string;
   emotions: EmotionSelection[];
+  advice: string;
 }
 
 /**
@@ -72,11 +73,12 @@ export async function POST(request: NextRequest) {
     // Use Gemini 2.0 flash-lite for analysis
     const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
 
-    const prompt = `You are an emotion analysis AI. Given the following transcribed text and available emotions, provide:
+    const prompt = `You are an emotion analysis AI and wellness coach. Given the following transcribed text and available emotions, provide:
 
 1. A short, descriptive session name (2-4 words)
 2. Select 1-6 emotions that best match the text
 3. Assign intensity values (up to 2 decimal places) where all intensities sum to exactly 1.0
+4. Generate personalized advice based on the emotional content and themes in the transcript
 
 Available emotions: ${emotionList}
 
@@ -90,14 +92,16 @@ Respond with ONLY a JSON object in this exact format:
       "emotion_id": number,
       "intensity": number
     }
-  ]
+  ],
+  "advice": "string"
 }
 
 Requirements:
 - session_name: 2-4 descriptive words
 - emotions: 1-6 emotions from the available list
 - intensity: decimal numbers (up to 2 decimal places) that sum to exactly 1.0
-- emotion_id: must match the IDs from the available emotions list`;
+- emotion_id: must match the IDs from the available emotions list
+- advice: 2-3 sentences of supportive, actionable advice based on the emotional content and themes in the transcript. Be encouraging and practical.`;
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
@@ -128,7 +132,7 @@ Requirements:
     }
 
     // Validate the response structure
-    if (!analysisResult.session_name || !analysisResult.emotions || !Array.isArray(analysisResult.emotions)) {
+    if (!analysisResult.session_name || !analysisResult.emotions || !Array.isArray(analysisResult.emotions) || !analysisResult.advice) {
       return NextResponse.json(
         {
           error: true,
@@ -178,12 +182,13 @@ Requirements:
       };
     });
 
-    console.log(`[INFO] Analysis completed successfully: "${analysisResult.session_name}" with ${enrichedEmotions.length} emotions`);
+    console.log(`[INFO] Analysis completed successfully: "${analysisResult.session_name}" with ${enrichedEmotions.length} emotions and advice`);
 
     return NextResponse.json(
       {
         session_name: analysisResult.session_name,
         emotions: enrichedEmotions,
+        advice: analysisResult.advice,
         timestamp: new Date().toISOString(),
       },
       { status: 200 }

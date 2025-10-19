@@ -1042,6 +1042,76 @@ export default function SolarScene({ data, headline }: Props) {
             </div>
           )}
 
+          {/* Session Advice */}
+          {selectedPlanet?.advice && (
+            <div
+              style={{
+                marginTop: "20px",
+                animation: "fadeInUp 0.6s ease-out 0.3s both",
+              }}
+            >
+              <h3
+                style={{
+                  fontSize: "18px",
+                  fontWeight: "600",
+                  color: "#ffffff",
+                  marginBottom: "12px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                }}
+              >
+                <div
+                  style={{
+                    width: "4px",
+                    height: "20px",
+                    background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                    borderRadius: "2px",
+                  }}
+                />
+                Personalized Advice
+              </h3>
+              <div
+                style={{
+                  background: "rgba(102, 126, 234, 0.1)",
+                  border: "1px solid rgba(102, 126, 234, 0.2)",
+                  borderRadius: "12px",
+                  padding: "20px",
+                  backdropFilter: "blur(10px)",
+                  transition: "all 0.3s ease",
+                  cursor: "pointer",
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.background = "rgba(102, 126, 234, 0.15)";
+                  e.currentTarget.style.borderColor = "rgba(102, 126, 234, 0.3)";
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                  e.currentTarget.style.boxShadow =
+                    "0 6px 20px rgba(102, 126, 234, 0.2)";
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.background = "rgba(102, 126, 234, 0.1)";
+                  e.currentTarget.style.borderColor = "rgba(102, 126, 234, 0.2)";
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = "none";
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: "14px",
+                    lineHeight: "1.6",
+                    color: "#ffffff",
+                    opacity: 0.9,
+                    textAlign: "left",
+                    whiteSpace: "pre-wrap",
+                    wordWrap: "break-word",
+                  }}
+                >
+                  {selectedPlanet.advice}
+                </div>
+              </div>
+            </div>
+          )}
+
           <div
             style={{
               marginTop: "32px",

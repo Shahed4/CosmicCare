@@ -12,6 +12,7 @@ interface SaveSessionRequest {
     emotion_id: number;
     intensity: number;
   }>;
+  advice?: string;
 }
 
 /**
@@ -23,7 +24,7 @@ export async function POST(request: NextRequest) {
     // Authenticate user
     const { supabase, user } = await createAuthenticatedSupabaseClient(request);
     
-    const { session_name, transcript, emotions }: SaveSessionRequest = await request.json();
+    const { session_name, transcript, emotions, advice }: SaveSessionRequest = await request.json();
 
     // Validate input
     if (!session_name || !transcript || !emotions) {
@@ -76,6 +77,7 @@ export async function POST(request: NextRequest) {
       transcript,
       randomColor,
       emotions,
+      advice || null,
       supabase
     );
 
