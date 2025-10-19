@@ -1,261 +1,443 @@
-# Cosmic Care 🌌
+# Cosmic Care — Rant & Reflect (Next.js + Whisper + Gemini)
 
-A Next.js application that visualizes emotional data through an interactive 3D solar system interface. Users can track their daily emotional states through voice recordings, AI-powered emotion analysis, and view their emotional patterns over time through both 3D visualizations and calendar views.
+This folder contains the Next.js app for Cosmic Care with an integrated "Rant & Reflect" feature — a voice-first emotional reflection tool that uses OpenAI Whisper for speech-to-text and Google Gemini for emotion analysis.
 
-## ✨ Features
+This README is focused on the Rant & Reflect integration and how to run it locally.
 
-### 🔐 Authentication System
-- **Supabase Integration**: Complete user authentication with signup, signin, and signout
-- **Protected Routes**: Authentication-required pages with automatic redirects
-- **User Profiles**: Display name support with personalized navigation
-- **Session Management**: Persistent login sessions with automatic token refresh
+## Features
 
-### 🎤 Voice Recording & AI Analysis
-- **Audio Recording**: Browser-based microphone recording with real-time timer
-- **Speech-to-Text**: OpenAI Whisper integration for accurate transcription
-- **AI Emotion Analysis**: Google Gemini 2.0 Flash for intelligent emotion detection
-- **Personalized Advice**: AI-generated wellness recommendations based on emotional content
-- **Session Naming**: Automatic generation of descriptive session names
+- Record short voice rants in the browser (MediaRecorder).
+- Transcribe audio with OpenAI Whisper (server-side API route).
+- Analyze emotional tone with Google Gemini (server-side API route).
+- Minimal, reactive UI components: `Recorder`, `TranscriptView`, `EmotionCard`.
 
-### 🌌 3D Solar System Visualization
-- **Interactive Solar Scene**: 3D solar system built with Three.js and React Three Fiber
-- **Dynamic Orbits**: Planets representing daily sessions with realistic orbital mechanics
-- **Moon Systems**: Emotional states visualized as moons orbiting their respective planets
-- **Real-time Animation**: Smooth orbital animations with randomized starting positions
-- **Analytical Modals**: Detailed emotional analytics for sun and planet interactions
-- **Camera Controls**: Smooth camera transitions and focus on selected planets
-- **Hover Interactions**: Rich tooltips and highlighting effects
+## File highlights
 
-### 📊 Emotional Data Management
-- **Structured Schema**: Positive and negative emotions with intensity tracking
-- **Session-based Organization**: Flexible session tracking (not limited to morning/afternoon/evening)
-- **Intensity Normalization**: All emotions per session sum to 1.0 for consistent visualization
-- **Color-coded Emotions**: Visual representation through color-coded emotional states
-- **Database Integration**: Supabase PostgreSQL with relational emotion data
+- `app/rant-reflect/page.tsx` — Rant & Reflect UI and orchestration.
+- `app/api/transcribe/route.ts` — serverless API route that accepts an audio `FormData` upload, calls Whisper and Gemini helpers, and returns the combined result.
+- `lib/whisper.ts` — Whisper helper wrapper for OpenAI audio transcription.
+- `lib/gemini.ts` — Gemini helper wrapper for emotion analysis.
+- `components/Recorder.tsx`, `components/TranscriptView.tsx`, `components/EmotionCard.tsx` — frontend UI pieces.
 
-### 📅 Calendar Visualization
-- **GitHub-style Calendar**: Emotional intensity displayed through color gradients
-- **Monthly Navigation**: Browse different months with intuitive controls
-- **Color Gradients**: 
-  - 🟢 Green gradients for positive emotional dominance (5% to 95% positive)
-  - 🔴 Red gradients for negative emotional dominance (5% to 95% negative)
-  - 🔵 Blue for balanced emotional states (50/50 split)
-- **Interactive Tooltips**: Detailed emotional breakdowns on hover
-- **Day Details**: Comprehensive session analysis for selected dates
-- **Session Breakdown**: Individual session analysis within each day
+## Environment variables
 
-### 🎨 User Interface
-- **Space-themed Design**: Dark cosmic background with golden accents
-- **Responsive Navigation**: Mobile-friendly navbar with dropdown user menu
-- **3D Background**: Animated space background with stars and nebulae
-- **Loading States**: Smooth transitions with space-themed loading animations
-- **Interactive Elements**: Hover effects, click animations, and smooth transitions
-- **Modal System**: Rich analytical overlays with detailed emotion breakdowns
+Create a `.env.local` in the `cosmic-care` folder with the following variables (or set them in your hosting platform):
 
-## 🛠️ Tech Stack
+```
+OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+GEMINI_API_KEY=ya29.a0AfH6S... (or your Gemini credential)
+# Optional: other keys your project needs (e.g. Supabase)
+```
 
-### Frontend
-- **Next.js 15.5.6**: React framework with App Router
-- **React 19.1.0**: Latest React with concurrent features
-- **TypeScript**: Type-safe development
-- **Tailwind CSS 4**: Utility-first CSS framework
+For convenience, a `.env.example` is included alongside this README.
 
-### 3D Graphics
-- **Three.js 0.180.0**: 3D graphics library
-- **React Three Fiber 9.4.0**: React renderer for Three.js
-- **@react-three/drei 10.7.6**: Useful helpers for R3F
-- **@react-three/postprocessing 3.0.4**: Post-processing effects
+## Local development (quick start)
 
-### AI & Audio Processing
-- **OpenAI 6.5.0**: Whisper API for speech-to-text transcription
-- **Google Generative AI 0.24.1**: Gemini 2.0 Flash for emotion analysis
-- **MediaRecorder API**: Browser-based audio recording
+1. Install dependencies
 
-### Backend & Database
-- **Supabase**: Backend-as-a-Service with PostgreSQL database
-- **@supabase/supabase-js 2.75.1**: JavaScript client library
-- **PostgreSQL**: Relational database with emotion and session tables
+```bash
+# From the cosmic-care folder
+npm install
+# or
+pnpm install
+```
 
-### Development Tools
-- **ESLint 9**: Code linting and formatting
-- **Turbopack**: Fast bundler for development
-- **TypeScript 5**: Type checking and IntelliSense
+2. Add your API keys to `.env.local`.
 
-## 🚀 Getting Started
+3. Start the dev server
+
+```bash
+npm run dev
+# or
+pnpm dev
+```
+
+4. Open `http://localhost:3000/rant-reflect` and test the recorder.
+
+Notes:
+- The transcription route expects a `POST` with a `FormData` field named `audio` (file). The page already sends `recording.webm` from the browser.
+- Keep audio sessions under 25MB to avoid serverless size limits.
+
+## Troubleshooting
+
+- If imports like `@/lib/whisper` cannot be resolved, ensure your `tsconfig.json` or `jsconfig.json` has `baseUrl`/`paths` configured.
+- If the Whisper or Gemini calls fail, check your env vars and API key scopes.
+
+## Next steps (suggested)
+
+- Add end-to-end tests for the transcription API using a small sample audio fixture.
+- Add persisted session history (Supabase/Postgres) to track emotional trends.
+- Implement real-time streaming transcription for more immediacy.
+
+---
+
+If you'd like, I can also:
+- Add a `.github/workflows` CI job that runs TypeScript checks and lints.
+- Add a small E2E test that POSTs a short audio file to the API route.
+# 🌟 Cosmic Care
+
+> **Visualize Your Day Through Space & Reflect on Your Emotions with AI**
+
+Cosmic Care is an innovative full-stack Next.js application that combines **3D space visualization** of your daily activities with **AI-powered emotional reflection** through voice. Transform your sessions into an interactive solar system and use the integrated **Rant & Reflect** feature to speak freely and receive intelligent emotional insights.
+
+---
+
+## 🎯 **Project Overview**
+
+**Cosmic Care** offers two core experiences:
+
+### 1. 🪐 **Solar System Visualization**
+Transform your daily sessions into beautiful 3D planets orbiting in space. Each planet represents a work session, and moons represent emotions associated with that session.
+
+### 2. 🎧 **Rant & Reflect (AI Emotional Analysis)**
+An AI-driven self-therapy tool that allows users to:
+- **Record voice rants** directly in the browser
+- **Transcribe speech to text** using OpenAI's Whisper API
+- **Analyze emotional tone** using Google's Gemini Pro AI
+- **Receive personalized insights** and suggestions for emotional wellness
+
+---
+
+## ✨ **Key Features**
+
+### Rant & Reflect Module
+* 🎙️ **Voice Recording Interface** - Record audio directly from the browser using Web Audio API
+* 🧾 **Speech-to-Text Conversion** - Whisper automatically transcribes user speech with high accuracy
+* 💬 **Emotion Classification** - Gemini analyzes emotional tone (calm, angry, anxious, hopeful, etc.)
+* 💡 **AI Insights** - Get compassionate suggestions based on your emotional state
+* ⚡ **Instant Feedback** - Real-time transcription and analysis
+* 📊 **Intensity Scoring** - Emotion intensity rated on a 1-10 scale
+
+### Cosmic Care Core
+* 🌌 **3D Space Environment** - Beautiful space visualization with Three.js
+* 🔐 **Authentication** - Secure user authentication with Supabase
+* 📅 **Calendar Integration** - Track and visualize sessions over time
+* 🎨 **Beautiful UI** - Modern, responsive design with smooth animations
+
+---
+
+## 🛠️ **Tech Stack**
+
+| Layer                  | Technology                              |
+| ---------------------- | --------------------------------------- |
+| **Framework**          | Next.js 15 (App Router)                 |
+| **Frontend**           | React 19, TypeScript, TailwindCSS       |
+| **3D Graphics**        | Three.js, React Three Fiber             |
+| **Backend**            | Next.js API Routes (Serverless)         |
+| **Authentication**     | Supabase                                |
+| **Speech Recognition** | OpenAI Whisper (`whisper-1`)            |
+| **Emotion Analysis**   | Google Gemini Pro                       |
+| **Audio Capture**      | MediaRecorder API (WebRTC)              |
+| **Deployment**         | Vercel (Recommended)                    |
+
+---
+
+## 📂 **Project Structure**
+
+```
+cosmic-care/
+│
+├── app/
+│   ├── page.tsx                        # Home page
+│   ├── layout.tsx                      # Root layout with navbar & auth
+│   ├── rant-reflect/
+│   │   └── page.tsx                    # Rant & Reflect main page
+│   ├── api/
+│   │   ├── transcribe/
+│   │   │   └── route.ts                # Whisper + Gemini API endpoint
+│   │   └── health/
+│   │       └── route.ts                # Health check endpoint
+│   ├── login/
+│   │   └── page.tsx                    # Login page
+│   ├── signup/
+│   │   └── page.tsx                    # Signup page
+│   └── dummy/                          # Sample session pages
+│
+├── components/
+│   ├── NavBar.tsx                      # Navigation bar
+│   ├── AuthModal.tsx                   # Authentication modal
+│   ├── SpaceBackground.tsx             # 3D space visualization
+│   ├── Recorder.tsx                    # Audio recording component
+│   ├── TranscriptView.tsx              # Display transcription
+│   ├── EmotionCard.tsx                 # Display emotion analysis
+│   └── Loader.tsx                      # Loading animation
+│
+├── lib/
+│   ├── whisper.ts                      # OpenAI Whisper integration
+│   ├── gemini.ts                       # Google Gemini integration
+│   └── supabase.ts                     # Supabase client setup
+│
+├── contexts/
+│   └── AuthContext.tsx                 # Authentication context
+│
+├── public/                             # Static assets
+├── .env.local                          # Environment variables
+├── next.config.ts                      # Next.js configuration
+├── package.json                        # Dependencies
+└── README.md                           # This file
+```
+
+---
+
+## 🚀 **Getting Started**
 
 ### Prerequisites
-- Node.js 18+ 
-- npm, yarn, pnpm, or bun
-- Supabase account and project
-- OpenAI API key (for Whisper transcription)
-- Google AI API key (for Gemini emotion analysis)
+- Node.js 18+ installed
+- npm or yarn package manager
+- OpenAI API key (for Whisper)
+- Google Gemini API key
+- Supabase account (optional, for auth features)
 
 ### Installation
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
-   cd cosmic-care
+   git clone https://github.com/yourusername/CosmicCare.git
+   cd CosmicCare/cosmic-care
    ```
 
 2. **Install dependencies**
    ```bash
    npm install
-   # or
-   yarn install
-   # or
-   pnpm install
    ```
 
-3. **Environment Setup**
+3. **Configure environment variables**
+
    Create a `.env.local` file in the root directory:
    ```env
-   # Supabase Configuration
-   NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+   # Supabase (Optional - for authentication)
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-   
-   # AI Services
+
+   # OpenAI Whisper API (Required for Rant & Reflect)
    OPENAI_API_KEY=your_openai_api_key
-   GEMINI_API_KEY=your_google_ai_api_key
+
+   # Google Gemini API (Required for emotion analysis)
+   GEMINI_API_KEY=your_gemini_api_key
    ```
 
-4. **Supabase Configuration**
-   - Create a new Supabase project
-   - Enable authentication with email/password
-   - Configure user metadata for display names
-   - Copy your project URL and anon key to `.env.local`
-
-5. **Run the development server**
+4. **Run the development server**
    ```bash
    npm run dev
-   # or
-   yarn dev
-   # or
-   pnpm dev
-   # or
-   bun dev
    ```
 
-6. **Open your browser**
+5. **Open in browser**
    Navigate to [http://localhost:3000](http://localhost:3000)
-
-### Data Constraints
-- **Intensity Normalization**: Sum of all emotions (positive + negative) per session = 1.0
-- **Session Structure**: Flexible session tracking (not limited to specific times)
-- **Color Coding**: Consistent color schemes for emotional visualization
-- **Date Format**: ISO date strings (YYYY-MM-DD) for consistency
-- **Audio Files**: Maximum 25MB for Whisper API processing
-
-## 🎮 Usage
-
-### Authentication Flow
-1. **Sign Up**: Create account with email, password, and display name
-2. **Sign In**: Access existing account
-3. **Protected Access**: Automatic redirect to login for protected pages
-4. **Sign Out**: Secure logout with session cleanup
-
-### Voice Recording & Analysis (`/today`)
-1. **Start Recording**: Click the floating "+" button to open recording modal
-2. **Record Audio**: Use browser microphone to record your thoughts
-3. **AI Processing**: Automatic transcription via Whisper and emotion analysis via Gemini
-4. **Review Results**: View generated session name, emotions, and personalized advice
-5. **Save Session**: Store the session in your personal database
-
-### 3D Solar System Visualization (`/today`)
-- **Sun**: Represents the day with overall emotional analytics
-- **Planets**: Each planet represents a session with unique colors
-- **Moons**: Emotional states orbiting their respective planets
-- **Interactions**: 
-  - Hover planets for detailed tooltips
-  - Click planets for focused analysis and camera tracking
-  - Click sun for comprehensive day analysis
-- **Analytics**: Emotional balance scores, distribution charts, dominant emotions
-- **Camera Controls**: Smooth transitions and focus on selected elements
-
-### Calendar View (`/my-calendar`)
-- **Monthly Navigation**: Browse different months with intuitive controls
-- **Color Coding**: Emotional intensity through color gradients
-- **Interactive**: Click dates for detailed emotional breakdowns
-- **Tooltips**: Hover for quick emotional summaries
-- **Session Details**: Comprehensive analysis of individual sessions within each day
-- **Emotional Trends**: Visual patterns across time periods
-
-### Key Interactions
-- **Hover Effects**: Rich tooltips and highlighting throughout the interface
-- **Modal System**: Detailed analytical overlays with emotion breakdowns
-- **Responsive Design**: Optimized for desktop and mobile experiences
-- **Loading States**: Smooth transitions during data processing
-
-## 🔧 Development
-
-### Available Scripts
-```bash
-npm run dev      # Start development server with Turbopack
-npm run build    # Build for production with Turbopack
-npm run start    # Start production server
-npm run lint     # Run ESLint
-```
-
-### Key Development Features
-- **Hot Reload**: Instant updates during development
-- **TypeScript**: Full type safety and IntelliSense
-- **ESLint**: Code quality and consistency
-- **Turbopack**: Fast bundling and compilation
-- **API Routes**: Serverless functions for AI processing
-- **Database Integration**: Type-safe Supabase client
-
-### Project Structure
-```
-cosmic-care/
-├── app/                    # Next.js App Router
-│   ├── api/               # API routes
-│   │   ├── analyze-emotions/  # Gemini AI emotion analysis
-│   │   ├── save-session/      # Session storage
-│   │   ├── transcribe-simple/ # Whisper transcription
-│   │   └── health/           # Health check endpoint
-│   ├── login/             # Authentication pages
-│   ├── signup/
-│   ├── today/             # 3D solar system view
-│   ├── my-calendar/       # Calendar visualization
-│   └── layout.tsx         # Root layout
-├── components/            # React components
-│   ├── SolarScene.tsx     # Main 3D visualization
-│   ├── NavBar.tsx         # Navigation component
-│   ├── Recorder.tsx       # Audio recording
-│   ├── RecordingModal.tsx # Recording interface
-│   └── ...               # Other UI components
-├── lib/                  # Utility libraries
-│   ├── database.ts       # Supabase database operations
-│   ├── whisper.ts        # OpenAI Whisper integration
-│   ├── gemini.ts         # Google AI integration
-│   └── auth-server.ts    # Server-side authentication
-├── contexts/             # React contexts
-│   └── AuthContext.tsx   # Authentication state
-└── constants/            # Type definitions
-    └── today.tsx         # Data structures
-```
-
-### API Endpoints
-- `POST /api/transcribe-simple` - Audio transcription via Whisper
-- `POST /api/analyze-emotions` - Emotion analysis via Gemini
-- `POST /api/save-session` - Store session data
-- `GET /api/health` - Service health check
-
-### Database Schema
-- **emotions**: Available emotion types with colors and polarity
-- **sessions**: User sessions with metadata and transcripts
-- **session_emotions**: Junction table linking sessions to emotions with intensity
-
-## 🙏 Acknowledgments
-
-- **Three.js**: For the amazing 3D graphics library
-- **Supabase**: For the powerful backend-as-a-service platform
-- **Next.js**: For the excellent React framework
-- **React Three Fiber**: For seamless Three.js integration with React
-- **OpenAI**: For the Whisper speech-to-text API
-- **Google AI**: For the Gemini emotion analysis capabilities
-- **Tailwind CSS**: For the utility-first styling approach
 
 ---
 
-Built using Next.js, Three.js, Supabase, OpenAI Whisper, and Google Gemini
+## 🎧 **Using Rant & Reflect**
+
+1. Navigate to **Rant & Reflect** from the navbar
+2. Click the **"START"** button to begin recording
+3. Speak freely about your thoughts, feelings, or experiences
+4. Click **"STOP"** when finished
+5. Wait for AI processing (usually 5-15 seconds)
+6. View your:
+   - 📝 **Transcription** - What you said
+   - 💭 **Emotion** - Detected emotional state
+   - 📊 **Intensity** - How strong the emotion is (1-10)
+   - 💡 **Insights** - Helpful suggestions from AI
+7. Click **"Record Another"** to start a new session
+
+---
+
+## 🧠 **How It Works**
+
+### Rant & Reflect Workflow
+
+```
+┌──────────────┐
+│ User Speaks  │
+│   (Browser)  │
+└──────┬───────┘
+       │ Audio Blob
+       ▼
+┌──────────────────┐
+│  POST /api/      │
+│  transcribe      │
+└────────┬─────────┘
+         │
+    ┌────▼────┐
+    │ Whisper │ ──► Transcribed Text
+    │   API   │
+    └────┬────┘
+         │
+    ┌────▼────┐
+    │ Gemini  │ ──► Emotion Analysis
+    │   Pro   │     (emotion, intensity, suggestions)
+    └────┬────┘
+         │
+         ▼
+┌─────────────────┐
+│ JSON Response   │
+│ to Frontend     │
+└─────────────────┘
+```
+
+### API Response Format
+```json
+{
+  "text": "I've been feeling overwhelmed by work lately...",
+  "emotion": "stressed",
+  "confidence": "8",
+  "suggestions": "Take regular breaks and practice mindfulness.",
+  "timestamp": "2025-10-18T16:25:00Z",
+  "processingTime": "7.32s",
+  "fileSize": "156.78 KB"
+}
+```
+
+---
+
+## 📡 **API Endpoints**
+
+### `POST /api/transcribe`
+Upload audio file and receive transcription + emotion analysis.
+
+**Request:**
+- Method: `POST`
+- Content-Type: `multipart/form-data`
+- Body: `audio` (File, max 25MB)
+
+**Response:**
+```json
+{
+  "text": "string",
+  "emotion": "string",
+  "confidence": "string",
+  "suggestions": "string",
+  "timestamp": "ISO string",
+  "processingTime": "string",
+  "fileSize": "string"
+}
+```
+
+### `GET /api/health`
+Health check endpoint.
+
+**Response:**
+```json
+{
+  "status": "healthy",
+  "timestamp": "ISO string",
+  "service": "Cosmic Care API",
+  "version": "1.0.0"
+}
+```
+
+---
+
+## 🎨 **Features & Components**
+
+### Recorder Component
+- Real-time recording with visual feedback
+- Timer display during recording
+- Microphone permission handling
+- Audio blob generation
+
+### Emotion Card
+- Color-coded by emotion type
+- Emoji representation
+- Intensity meter (1-10)
+- AI-generated insights
+
+### Transcript View
+- Clean, readable text display
+- Quotation formatting
+- Smooth animations
+
+---
+
+## 🔒 **Security & Privacy**
+
+- Audio files are **not stored** on servers
+- Processing happens in real-time via API
+- All data transmission uses HTTPS
+- Environment variables protect API keys
+- Supabase handles authentication securely
+
+---
+
+## 🌐 **Deployment**
+
+### Deploy to Vercel (Recommended)
+
+1. Push your code to GitHub
+2. Go to [vercel.com](https://vercel.com)
+3. Import your repository
+4. Add environment variables in Vercel dashboard
+5. Deploy!
+
+Vercel automatically handles:
+- Serverless API routes
+- Edge caching
+- Automatic HTTPS
+- Zero-config deployment
+
+---
+
+## 🚧 **Future Enhancements**
+
+- [ ] 🔄 **Real-time streaming transcription**
+- [ ] 📊 **Emotion tracking dashboard over time**
+- [ ] 🗄️ **Save rant history to database**
+- [ ] 🧘 **Personalized wellness recommendations**
+- [ ] 🌍 **Multilingual support**
+- [ ] 📱 **Mobile app version**
+- [ ] 🔗 **Integration with calendar for mood tracking**
+- [ ] 🎯 **Goal setting based on emotional patterns**
+
+---
+
+## 🤝 **Contributing**
+
+Contributions are welcome! Please follow these steps:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+---
+
+## 📄 **License**
+
+This project is open source and available under the MIT License.
+
+---
+
+## 🙏 **Acknowledgments**
+
+- **OpenAI** for the Whisper speech recognition model
+- **Google** for the Gemini Pro AI model
+- **Vercel** for the amazing Next.js framework
+- **Three.js** for 3D graphics capabilities
+- **Supabase** for authentication infrastructure
+
+---
+
+## 📧 **Contact**
+
+For questions, suggestions, or feedback:
+- Create an issue on GitHub
+- Email: your-email@example.com
+
+---
+
+## 🎯 **Summary**
+
+**Cosmic Care** combines cutting-edge AI technology with beautiful 3D visualization to create a unique self-reflection and productivity tracking experience. The **Rant & Reflect** module demonstrates how AI can be used compassionately to help people understand their emotions better.
+
+By merging:
+- 🎤 **Speech recognition (Whisper)**
+- 🧠 **Emotional intelligence (Gemini)**
+- 🌌 **3D visualization (Three.js)**
+- ⚡ **Seamless full-stack integration (Next.js)**
+
+We've created a powerful tool for **mental wellness** and **self-awareness** in the modern digital age.
+
+---
+
+**Built with ❤️ by the Cosmic Care Team**
