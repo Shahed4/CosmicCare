@@ -141,7 +141,7 @@ export default function LoginPage() {
               WebkitTextFillColor: 'transparent',
               letterSpacing: '-0.02em'
             }}>
-              Solar Sessions
+              Cosmic Care
             </h1>
           </Link>
           <h2 style={{

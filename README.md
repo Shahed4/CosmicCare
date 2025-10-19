@@ -1,4 +1,4 @@
-# Solar Sessions 🌌
+# Cosmic Care 🌌
 
 A Next.js application that visualizes emotional data through an interactive 3D solar system interface. Users can track their daily emotional states across different sessions (morning, afternoon, evening) and view their emotional patterns over time through both 3D visualizations and calendar views.
 

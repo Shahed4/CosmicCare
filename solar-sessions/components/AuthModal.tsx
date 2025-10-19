@@ -137,7 +137,7 @@ export default function AuthModal({ isOpen, onClose, mode, onModeChange }: AuthM
                 letterSpacing: '-0.02em',
                 lineHeight: 1.2
               }}>
-                {mode === 'login' ? 'Welcome Back' : 'Join Solar Sessions'}
+                {mode === 'login' ? 'Welcome Back' : 'Join Cosmic Care'}
               </h2>
               <p style={{
                 margin: '0.5rem 0 0 0',

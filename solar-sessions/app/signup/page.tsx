@@ -158,7 +158,7 @@ export default function SignupPage() {
               WebkitTextFillColor: 'transparent',
               letterSpacing: '-0.02em'
             }}>
-              Solar Sessions
+              Cosmic Care
             </h1>
           </Link>
           <h2 style={{
@@ -167,7 +167,7 @@ export default function SignupPage() {
             fontWeight: '600',
             color: 'rgba(255, 255, 255, 0.9)'
           }}>
-            Join Solar Sessions
+            Join Cosmic Care
           </h2>
           <p style={{
             margin: 0,

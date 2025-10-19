@@ -179,7 +179,7 @@ export default function SunOnlyScene({ headline, onRecordSession }: Props) {
             color: "#ffd27f",
           }}
         >
-          Solar Sessions
+          Cosmic Care
         </div>
         <div
           style={{
