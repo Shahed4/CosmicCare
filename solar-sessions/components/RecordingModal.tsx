@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useAuth } from "../contexts/AuthContext";
 
 interface RecordingModalProps {
   isOpen: boolean;
@@ -8,10 +9,12 @@ interface RecordingModalProps {
 }
 
 export default function RecordingModal({ isOpen, onClose }: RecordingModalProps) {
+  const { user } = useAuth();
   const [isRecording, setIsRecording] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [transcription, setTranscription] = useState<string>("");
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string>("");
   const [recordingTime, setRecordingTime] = useState(0);
   
@@ -42,7 +45,8 @@ export default function RecordingModal({ isOpen, onClose }: RecordingModalProps)
     setIsRecording(false);
     setIsPaused(false);
     setIsProcessing(false);
-    setTranscription("");
+    setIsAnalyzing(false);
+    setIsSaving(false);
     setError("");
     setRecordingTime(0);
     
@@ -157,7 +161,8 @@ export default function RecordingModal({ isOpen, onClose }: RecordingModalProps)
       const data = await response.json();
 
       if (response.ok) {
-        setTranscription(data.text || "");
+        // Continue with emotion analysis and auto-save
+        await analyzeEmotionsAndSave(data.text);
       } else {
         setError(data.message || "Transcription failed");
       }
@@ -166,6 +171,69 @@ export default function RecordingModal({ isOpen, onClose }: RecordingModalProps)
       console.error("Error processing audio:", err);
     } finally {
       setIsProcessing(false);
+    }
+  };
+
+  const analyzeEmotionsAndSave = async (text: string) => {
+    setIsAnalyzing(true);
+    setError("");
+
+    try {
+      // Step 1: Analyze emotions
+      const analysisResponse = await fetch("/api/analyze-emotions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ text }),
+      });
+
+      const analysisData = await analysisResponse.json();
+
+      if (!analysisResponse.ok) {
+        setError(analysisData.message || "Emotion analysis failed");
+        return;
+      }
+
+      // Step 2: Auto-save session
+      if (!user) {
+        setError("User not authenticated");
+        return;
+      }
+
+      setIsSaving(true);
+
+      const saveResponse = await fetch("/api/save-session", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          session_name: analysisData.session_name,
+          transcript: text,
+          emotions: analysisData.emotions.map((e: any) => ({
+            emotion_id: e.emotion_id,
+            intensity: e.intensity,
+          })),
+          user_id: user.id,
+        }),
+      });
+
+      const saveData = await saveResponse.json();
+
+      if (saveResponse.ok) {
+        // Success! Close modal and refresh page
+        handleClose();
+        window.location.reload();
+      } else {
+        setError(saveData.message || "Failed to save session");
+      }
+    } catch (err) {
+      setError("Failed to process session. Please try again.");
+      console.error("Error processing session:", err);
+    } finally {
+      setIsAnalyzing(false);
+      setIsSaving(false);
     }
   };
 
@@ -275,8 +343,7 @@ export default function RecordingModal({ isOpen, onClose }: RecordingModalProps)
           </div>
 
           {/* Recording Controls */}
-          {!transcription && (
-            <div style={{ textAlign: "center", marginBottom: "36px" }}>
+          <div style={{ textAlign: "center", marginBottom: "36px" }}>
               {!isRecording && !isProcessing && (
                 <div style={{ position: "relative", zIndex: 1, pointerEvents: "auto" }}>
                   <button
@@ -439,7 +506,7 @@ export default function RecordingModal({ isOpen, onClose }: RecordingModalProps)
                 </div>
               )}
 
-              {isProcessing && (
+              {(isProcessing || isAnalyzing || isSaving) && (
                 <div style={{ textAlign: "center" }}>
                   <div style={{ position: "relative", display: "inline-block" }}>
                     <div
@@ -447,7 +514,11 @@ export default function RecordingModal({ isOpen, onClose }: RecordingModalProps)
                         width: "100px",
                         height: "100px",
                         borderRadius: "50%",
-                        background: "linear-gradient(135deg, #ffd700, #ff8c00)",
+                        background: isSaving 
+                          ? "linear-gradient(135deg, #96CEB4, #85C1A3)" 
+                          : isAnalyzing 
+                          ? "linear-gradient(135deg, #4ecdc4, #45b7d1)" 
+                          : "linear-gradient(135deg, #ffd700, #ff8c00)",
                         border: "none",
                         color: "white",
                         fontSize: "32px",
@@ -456,7 +527,11 @@ export default function RecordingModal({ isOpen, onClose }: RecordingModalProps)
                         justifyContent: "center",
                         margin: "0 auto",
                         animation: "spin 1.5s linear infinite",
-                        boxShadow: "0 12px 30px rgba(255, 215, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)",
+                        boxShadow: isSaving 
+                          ? "0 12px 30px rgba(150, 206, 180, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)"
+                          : isAnalyzing 
+                          ? "0 12px 30px rgba(78, 205, 196, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)"
+                          : "0 12px 30px rgba(255, 215, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)",
                         position: "relative",
                         overflow: "hidden",
                       }}
@@ -469,7 +544,7 @@ export default function RecordingModal({ isOpen, onClose }: RecordingModalProps)
                         bottom: 0,
                         background: "radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3), transparent 50%)",
                       }} />
-                      ⏳
+                      {isSaving ? "💾" : isAnalyzing ? "🧠" : "⏳"}
                     </div>
                     {/* Processing rings */}
                     <div
@@ -479,7 +554,7 @@ export default function RecordingModal({ isOpen, onClose }: RecordingModalProps)
                         left: "-8px",
                         right: "-8px",
                         bottom: "-8px",
-                        border: "2px solid rgba(255, 215, 0, 0.3)",
+                        border: `2px solid ${isSaving ? 'rgba(150, 206, 180, 0.3)' : isAnalyzing ? 'rgba(78, 205, 196, 0.3)' : 'rgba(255, 215, 0, 0.3)'}`,
                         borderRadius: "50%",
                         animation: "pulse 1.5s ease-in-out infinite",
                       }}
@@ -491,7 +566,7 @@ export default function RecordingModal({ isOpen, onClose }: RecordingModalProps)
                         left: "-16px",
                         right: "-16px",
                         bottom: "-16px",
-                        border: "1px solid rgba(255, 215, 0, 0.2)",
+                        border: `1px solid ${isSaving ? 'rgba(150, 206, 180, 0.2)' : isAnalyzing ? 'rgba(78, 205, 196, 0.2)' : 'rgba(255, 215, 0, 0.2)'}`,
                         borderRadius: "50%",
                         animation: "pulse 1.5s ease-in-out infinite 0.5s",
                       }}
@@ -502,11 +577,11 @@ export default function RecordingModal({ isOpen, onClose }: RecordingModalProps)
                       marginTop: "20px",
                       fontSize: "18px",
                       fontWeight: "700",
-                      color: "#ffd700",
+                      color: isSaving ? "#96CEB4" : isAnalyzing ? "#4ecdc4" : "#ffd700",
                       textShadow: "0 2px 4px rgba(0, 0, 0, 0.3)",
                     }}
                   >
-                    ✨ Processing...
+                    {isSaving ? "💾 Saving..." : isAnalyzing ? "🧠 Analyzing..." : "✨ Processing..."}
                   </div>
                   <div style={{ 
                     fontSize: "13px", 
@@ -515,57 +590,12 @@ export default function RecordingModal({ isOpen, onClose }: RecordingModalProps)
                     fontWeight: "400",
                     lineHeight: "1.4",
                   }}>
-                    Transcribing your speech with AI
+                    {isSaving ? "Saving session to database" : isAnalyzing ? "Analyzing emotions with AI" : "Transcribing your speech with AI"}
                   </div>
                 </div>
               )}
             </div>
-          )}
 
-          {/* Transcription Result */}
-          {transcription && (
-            <div style={{ marginBottom: "36px" }}>
-              <div
-                style={{
-                  fontSize: "18px",
-                  fontWeight: "700",
-                  marginBottom: "16px",
-                  color: "#4ecdc4",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                }}
-              >
-                <span style={{ fontSize: "20px" }}>📝</span>
-                Transcription
-              </div>
-              <div
-                style={{
-                  background: "linear-gradient(135deg, rgba(78, 205, 196, 0.1), rgba(78, 205, 196, 0.05))",
-                  border: "1px solid rgba(78, 205, 196, 0.2)",
-                  borderRadius: "16px",
-                  padding: "20px",
-                  fontSize: "15px",
-                  lineHeight: "1.6",
-                  minHeight: "120px",
-                  maxHeight: "250px",
-                  overflowY: "auto",
-                  position: "relative",
-                  boxShadow: "inset 0 2px 4px rgba(0, 0, 0, 0.1)",
-                }}
-              >
-                <div style={{ 
-                  position: "absolute", 
-                  top: 0, 
-                  left: 0, 
-                  right: 0, 
-                  height: "1px",
-                  background: "linear-gradient(90deg, transparent, rgba(78, 205, 196, 0.3), transparent)",
-                }} />
-                {transcription}
-              </div>
-            </div>
-          )}
 
           {/* Error Message */}
           {error && (

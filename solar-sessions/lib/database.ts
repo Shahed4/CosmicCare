@@ -176,6 +176,93 @@ export async function fetchSessionsForDateRange(
   return dayDataArray.sort((a, b) => a.date.localeCompare(b.date));
 }
 
+// Create a new session
+export async function createSession(
+  userId: string,
+  name: string,
+  transcript: string,
+  color: string
+): Promise<DatabaseSession | null> {
+  const { data, error } = await supabase
+    .from('sessions')
+    .insert({
+      user_id: userId,
+      name: name,
+      audio_file: null,
+      transcript: transcript,
+      color: color,
+    })
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error creating session:', error);
+    return null;
+  }
+
+  return data;
+}
+
+// Create session emotions
+export async function createSessionEmotions(
+  sessionId: number,
+  emotions: Array<{
+    emotion_id: number;
+    intensity: number;
+  }>
+): Promise<boolean> {
+  const sessionEmotionsData = emotions.map(emotion => ({
+    session_id: sessionId,
+    emotion_id: emotion.emotion_id,
+    intensity: emotion.intensity,
+  }));
+
+  const { error } = await supabase
+    .from('session_emotions')
+    .insert(sessionEmotionsData);
+
+  if (error) {
+    console.error('Error creating session emotions:', error);
+    return false;
+  }
+
+  return true;
+}
+
+// Complete session creation with emotions
+export async function createSessionWithEmotions(
+  userId: string,
+  name: string,
+  transcript: string,
+  color: string,
+  emotions: Array<{
+    emotion_id: number;
+    intensity: number;
+  }>
+): Promise<{ success: boolean; sessionId?: number; error?: string }> {
+  try {
+    // Create the session
+    const session = await createSession(userId, name, transcript, color);
+    if (!session) {
+      return { success: false, error: 'Failed to create session' };
+    }
+
+    // Create the session emotions
+    const emotionsCreated = await createSessionEmotions(session.id, emotions);
+    if (!emotionsCreated) {
+      return { success: false, error: 'Failed to create session emotions' };
+    }
+
+    return { success: true, sessionId: session.id };
+  } catch (error) {
+    console.error('Error in createSessionWithEmotions:', error);
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Unknown error occurred' 
+    };
+  }
+}
+
 // Fetch all available emotions
 export async function fetchEmotions(): Promise<DatabaseEmotion[]> {
   const { data, error } = await supabase
