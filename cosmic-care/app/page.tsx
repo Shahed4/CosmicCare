@@ -81,7 +81,7 @@ export default function HomePage() {
             letterSpacing: "-0.02em",
             lineHeight: 1.1
           }}>
-            Solar Sessions
+            Cosmic Care
           </h1>
           <p style={{
             fontSize: "clamp(1.2rem, 3vw, 1.8rem)",

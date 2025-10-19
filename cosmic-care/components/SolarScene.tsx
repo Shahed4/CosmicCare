@@ -208,7 +208,7 @@ export default function SolarScene({ data, headline }: Props) {
             color: "#ffd27f",
           }}
         >
-          Solar Sessions
+          Cosmic Care
         </div>
         <div
           style={{

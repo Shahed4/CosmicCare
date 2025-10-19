@@ -8,7 +8,7 @@ export async function GET() {
   return NextResponse.json({
     status: "healthy",
     timestamp: new Date().toISOString(),
-    service: "Solar Sessions API",
+    service: "Cosmic Care API",
     version: "1.0.0",
   });
 }

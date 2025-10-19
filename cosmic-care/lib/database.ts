@@ -1,4 +1,4 @@
-import { supabase } from '../lib/supabase';
+import { supabase } from './supabase';
 import { SupabaseClient } from '@supabase/supabase-js';
 
 // Types matching your database schema

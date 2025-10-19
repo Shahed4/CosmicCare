@@ -5,15 +5,16 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '../../contexts/AuthContext';
 
-export default function LoginPage() {
+export default function SignupPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showDisplayNameField, setShowDisplayNameField] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
   const router = useRouter();
-  const { signIn, user } = useAuth();
+  const { signUp, user } = useAuth();
 
   // Redirect if user is already authenticated
   useEffect(() => {
@@ -69,13 +70,29 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setMessage(null);
+
+    // Validate passwords match
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      setLoading(false);
+      return;
+    }
+
+    // Validate password strength
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters long');
+      setLoading(false);
+      return;
+    }
 
     try {
-      const { error } = await signIn(email, password);
+      const { error } = await signUp(email, password, displayName);
       if (error) {
         setError(error.message);
       } else {
-        router.push('/');
+        setMessage('Check your email for the confirmation link!');
+        // Don't redirect immediately, let user see the success message
       }
     } catch (err) {
       setError('An unexpected error occurred');
@@ -141,7 +158,7 @@ export default function LoginPage() {
               WebkitTextFillColor: 'transparent',
               letterSpacing: '-0.02em'
             }}>
-              Solar Sessions
+              Cosmic Care
             </h1>
           </Link>
           <h2 style={{
@@ -150,26 +167,62 @@ export default function LoginPage() {
             fontWeight: '600',
             color: 'rgba(255, 255, 255, 0.9)'
           }}>
-            Welcome Back
+            Join Cosmic Care
           </h2>
           <p style={{
             margin: 0,
             fontSize: '0.9rem',
             color: 'rgba(255, 255, 255, 0.6)'
           }}>
-            Sign in to explore your cosmic journey
-          </p>
-          <p style={{
-            margin: '0.5rem 0 0 0',
-            fontSize: '0.8rem',
-            color: 'rgba(255, 255, 255, 0.5)'
-          }}>
-            Don&apos;t have a display name? <Link href="/signup" style={{ color: '#ffd700', textDecoration: 'none' }}>Sign up</Link> to set one
+            Create your account to start your space adventure
           </p>
         </div>
 
         {/* Form */}
         <form onSubmit={handleSubmit}>
+          <div style={{ marginBottom: '1.5rem' }}>
+            <label style={{
+              display: 'block',
+              marginBottom: '0.75rem',
+              fontSize: '0.95rem',
+              fontWeight: '600',
+              color: 'rgba(255, 255, 255, 0.9)',
+              letterSpacing: '0.02em'
+            }}>
+              Display Name
+            </label>
+            <input
+              type="text"
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              required
+              placeholder="Enter your display name"
+              style={{
+                width: '100%',
+                padding: '1rem',
+                borderRadius: '12px',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                background: 'rgba(255, 255, 255, 0.08)',
+                color: 'white',
+                fontSize: '1rem',
+                outline: 'none',
+                transition: 'all 0.3s ease',
+                backdropFilter: 'blur(10px)',
+                boxSizing: 'border-box'
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = '#ffd700';
+                e.target.style.background = 'rgba(255, 255, 255, 0.12)';
+                e.target.style.boxShadow = '0 0 0 3px rgba(255, 215, 0, 0.1)';
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = 'rgba(255, 255, 255, 0.15)';
+                e.target.style.background = 'rgba(255, 255, 255, 0.08)';
+                e.target.style.boxShadow = 'none';
+              }}
+            />
+          </div>
+
           <div style={{ marginBottom: '1.5rem' }}>
             <label style={{
               display: 'block',
@@ -213,7 +266,7 @@ export default function LoginPage() {
             />
           </div>
 
-          <div style={{ marginBottom: '2rem' }}>
+          <div style={{ marginBottom: '1.5rem' }}>
             <label style={{
               display: 'block',
               marginBottom: '0.75rem',
@@ -229,7 +282,51 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              placeholder="Enter your password"
+              minLength={6}
+              placeholder="Create a password (min 6 characters)"
+              style={{
+                width: '100%',
+                padding: '1rem',
+                borderRadius: '12px',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                background: 'rgba(255, 255, 255, 0.08)',
+                color: 'white',
+                fontSize: '1rem',
+                outline: 'none',
+                transition: 'all 0.3s ease',
+                backdropFilter: 'blur(10px)',
+                boxSizing: 'border-box'
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = '#ffd700';
+                e.target.style.background = 'rgba(255, 255, 255, 0.12)';
+                e.target.style.boxShadow = '0 0 0 3px rgba(255, 215, 0, 0.1)';
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = 'rgba(255, 255, 255, 0.15)';
+                e.target.style.background = 'rgba(255, 255, 255, 0.08)';
+                e.target.style.boxShadow = 'none';
+              }}
+            />
+          </div>
+
+          <div style={{ marginBottom: '2rem' }}>
+            <label style={{
+              display: 'block',
+              marginBottom: '0.75rem',
+              fontSize: '0.95rem',
+              fontWeight: '600',
+              color: 'rgba(255, 255, 255, 0.9)',
+              letterSpacing: '0.02em'
+            }}>
+              Confirm Password
+            </label>
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              placeholder="Confirm your password"
               style={{
                 width: '100%',
                 padding: '1rem',
@@ -270,6 +367,20 @@ export default function LoginPage() {
             </div>
           )}
 
+          {message && (
+            <div style={{
+              background: 'rgba(76, 175, 80, 0.1)',
+              border: '1px solid rgba(76, 175, 80, 0.3)',
+              borderRadius: '8px',
+              padding: '0.75rem',
+              marginBottom: '1rem',
+              color: '#4caf50',
+              fontSize: '0.9rem'
+            }}>
+              {message}
+            </div>
+          )}
+
           <button
             type="submit"
             disabled={loading}
@@ -278,8 +389,8 @@ export default function LoginPage() {
               padding: '1rem',
               borderRadius: '12px',
               border: 'none',
-              background: loading
-                ? 'rgba(255, 215, 0, 0.3)'
+              background: loading 
+                ? 'rgba(255, 215, 0, 0.3)' 
                 : 'linear-gradient(45deg, #ffd700, #ff8c00)',
               color: loading ? 'rgba(255, 255, 255, 0.7)' : '#000',
               fontSize: '1.1rem',
@@ -288,8 +399,8 @@ export default function LoginPage() {
               transition: 'all 0.3s ease',
               textTransform: 'uppercase',
               letterSpacing: '0.05em',
-              boxShadow: loading
-                ? 'none'
+              boxShadow: loading 
+                ? 'none' 
                 : '0 8px 25px rgba(255, 215, 0, 0.3)',
               marginBottom: '1.5rem'
             }}
@@ -308,7 +419,7 @@ export default function LoginPage() {
           >
             {loading ? (
               <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
-                <span style={{
+                <span style={{ 
                   display: 'inline-block',
                   width: '16px',
                   height: '16px',
@@ -317,12 +428,12 @@ export default function LoginPage() {
                   borderTopColor: 'rgba(255, 255, 255, 0.8)',
                   animation: 'spin 1s linear infinite'
                 }} />
-                Signing In...
+                Creating Account...
               </span>
             ) : (
               <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
-                <span>🔑</span>
-                Sign In
+                <span>✨</span>
+                Sign Up
               </span>
             )}
           </button>
@@ -334,9 +445,9 @@ export default function LoginPage() {
           fontSize: '0.9rem',
           color: 'rgba(255, 255, 255, 0.6)'
         }}>
-          Don&apos;t have an account?{' '}
-          <Link
-            href="/signup"
+          Already have an account?{' '}
+          <Link 
+            href="/login"
             style={{
               color: '#ffd700',
               textDecoration: 'none',
@@ -350,7 +461,7 @@ export default function LoginPage() {
               e.currentTarget.style.color = '#ffd700';
             }}
           >
-            Sign up
+            Sign in
           </Link>
         </div>
       </div>
@@ -361,7 +472,7 @@ export default function LoginPage() {
           0%, 100% { opacity: 0.3; }
           50% { opacity: 0.6; }
         }
-
+        
         @keyframes spin {
           from {
             transform: rotate(0deg);

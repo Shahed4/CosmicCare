@@ -2,7 +2,7 @@ import NavBar from "../components/NavBar";
 import { AuthProvider } from "../contexts/AuthContext";
 
 export const metadata = { 
-  title: "Solar Sessions - Visualize Your Day Through Space", 
+  title: "Cosmic Care - Visualize Your Day Through Space", 
   description: "Transform your daily sessions into an interactive 3D solar system. Each planet represents a session, moons represent emotions. Explore your day in beautiful space." 
 };
 

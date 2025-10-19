@@ -77,7 +77,7 @@ export default function NavBar() {
           WebkitTextFillColor: "transparent",
           letterSpacing: "-0.02em"
         }}>
-          Solar Sessions
+          Cosmic Care
         </div>
       </Link>
 

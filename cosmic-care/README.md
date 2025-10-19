@@ -1,6 +1,6 @@
-# Solar Sessions — Rant & Reflect (Next.js + Whisper + Gemini)
+# Cosmic Care — Rant & Reflect (Next.js + Whisper + Gemini)
 
-This folder contains the Next.js app for Solar Sessions with an integrated "Rant & Reflect" feature — a voice-first emotional reflection tool that uses OpenAI Whisper for speech-to-text and Google Gemini for emotion analysis.
+This folder contains the Next.js app for Cosmic Care with an integrated "Rant & Reflect" feature — a voice-first emotional reflection tool that uses OpenAI Whisper for speech-to-text and Google Gemini for emotion analysis.
 
 This README is focused on the Rant & Reflect integration and how to run it locally.
 
@@ -21,7 +21,7 @@ This README is focused on the Rant & Reflect integration and how to run it local
 
 ## Environment variables
 
-Create a `.env.local` in the `solar-sessions` folder with the following variables (or set them in your hosting platform):
+Create a `.env.local` in the `cosmic-care` folder with the following variables (or set them in your hosting platform):
 
 ```
 OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -36,7 +36,7 @@ For convenience, a `.env.example` is included alongside this README.
 1. Install dependencies
 
 ```bash
-# From the solar-sessions folder
+# From the cosmic-care folder
 npm install
 # or
 pnpm install
@@ -74,17 +74,17 @@ Notes:
 If you'd like, I can also:
 - Add a `.github/workflows` CI job that runs TypeScript checks and lints.
 - Add a small E2E test that POSTs a short audio file to the API route.
-# 🌟 Solar Sessions
+# 🌟 Cosmic Care
 
 > **Visualize Your Day Through Space & Reflect on Your Emotions with AI**
 
-Solar Sessions is an innovative full-stack Next.js application that combines **3D space visualization** of your daily activities with **AI-powered emotional reflection** through voice. Transform your sessions into an interactive solar system and use the integrated **Rant & Reflect** feature to speak freely and receive intelligent emotional insights.
+Cosmic Care is an innovative full-stack Next.js application that combines **3D space visualization** of your daily activities with **AI-powered emotional reflection** through voice. Transform your sessions into an interactive solar system and use the integrated **Rant & Reflect** feature to speak freely and receive intelligent emotional insights.
 
 ---
 
 ## 🎯 **Project Overview**
 
-**Solar Sessions** offers two core experiences:
+**Cosmic Care** offers two core experiences:
 
 ### 1. 🪐 **Solar System Visualization**
 Transform your daily sessions into beautiful 3D planets orbiting in space. Each planet represents a work session, and moons represent emotions associated with that session.
@@ -108,7 +108,7 @@ An AI-driven self-therapy tool that allows users to:
 * ⚡ **Instant Feedback** - Real-time transcription and analysis
 * 📊 **Intensity Scoring** - Emotion intensity rated on a 1-10 scale
 
-### Solar Sessions Core
+### Cosmic Care Core
 * 🌌 **3D Space Environment** - Beautiful space visualization with Three.js
 * 🔐 **Authentication** - Secure user authentication with Supabase
 * 📅 **Calendar Integration** - Track and visualize sessions over time
@@ -135,7 +135,7 @@ An AI-driven self-therapy tool that allows users to:
 ## 📂 **Project Structure**
 
 ```
-solar-sessions/
+cosmic-care/
 │
 ├── app/
 │   ├── page.tsx                        # Home page
@@ -192,8 +192,8 @@ solar-sessions/
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/SolarSessions.git
-   cd SolarSessions/solar-sessions
+   git clone https://github.com/yourusername/CosmicCare.git
+   cd CosmicCare/cosmic-care
    ```
 
 2. **Install dependencies**
@@ -321,7 +321,7 @@ Health check endpoint.
 {
   "status": "healthy",
   "timestamp": "ISO string",
-  "service": "Solar Sessions API",
+  "service": "Cosmic Care API",
   "version": "1.0.0"
 }
 ```
@@ -428,7 +428,7 @@ For questions, suggestions, or feedback:
 
 ## 🎯 **Summary**
 
-**Solar Sessions** combines cutting-edge AI technology with beautiful 3D visualization to create a unique self-reflection and productivity tracking experience. The **Rant & Reflect** module demonstrates how AI can be used compassionately to help people understand their emotions better.
+**Cosmic Care** combines cutting-edge AI technology with beautiful 3D visualization to create a unique self-reflection and productivity tracking experience. The **Rant & Reflect** module demonstrates how AI can be used compassionately to help people understand their emotions better.
 
 By merging:
 - 🎤 **Speech recognition (Whisper)**
@@ -440,4 +440,4 @@ We've created a powerful tool for **mental wellness** and **self-awareness** in 
 
 ---
 
-**Built with ❤️ by the Solar Sessions Team**
+**Built with ❤️ by the Cosmic Care Team**
