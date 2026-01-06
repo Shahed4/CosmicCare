@@ -14,7 +14,7 @@
     "@react-three/fiber": "^9.4.0",
     "@react-three/postprocessing": "^3.0.4",
     "@supabase/supabase-js": "^2.75.1",
-    "next": "15.5.6",
+    "next": "15.5.9",
     "openai": "^6.5.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
